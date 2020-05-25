@@ -263,4 +263,4 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 if __name__ == "__main__":
 	driver = AmbientWeatherAPI()
 	for packet in driver.genLoopPackets():
-		print weeutil.weeutil.timestamp_to_string(packet['dateTime']), packet
+		print(weeutil.weeutil.timestamp_to_string(packet['dateTime']), packet)
