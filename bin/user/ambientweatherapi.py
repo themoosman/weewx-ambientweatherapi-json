@@ -118,6 +118,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 		while True:
 			# Query the API to get the latest reading.
 			try:
+				error_occured = False
 				logging.debug("starting getLoopPackets")
 
 				#Adding an extra buffer so the API throttle limit isn't hit
@@ -126,13 +127,22 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 
 				#init the API
 				weather = AmbientAPI(AMBIENT_ENDPOINT=self.api_url, AMBIENT_API_KEY=self.api_key, AMBIENT_APPLICATION_KEY=self.api_app_key)
+				logging.debug("Init API call returned")
 
 				#get the first device
 				devices = weather.get_devices()
+				logging.debug("Got weather devices")
+				
+				if not devices:
+					logging.error('AmbientAPI get_devices() returned empty dict')
+					raise Exception('AmbientAPI get_devices() returned empty dict')
+				else:
+					logging.debug('Weather get_devices() payload not empty')
 
 				#get the last report
 				data = devices[0].last_data
-				info = devices[0].info
+				#info = devices[0].info
+				logging.debug("Got last report")
 
 				#Convert the epoch to the format weewx wants.
 				current_observation = self.convert_epoch_ms_to_sec(data["dateutc"])
@@ -199,11 +209,15 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 				logging.error(DRIVER_NAME + " driver encountered an error.")
 				syslog.syslog("Error caught was: %s" % e)
 				logging.error("Error caught was: %s" % e)
-				pass
+				error_occured = True
 
 			#build the packet data
 			try:
 				logging.debug("============Starting Packet Build============")
+				if error_occured:
+					error_occured = False
+					raise Exception('Previous error occured, skipping packet build.')
+
 				_packet = {
 					'dateTime' : current_observation,
 					'usUnits' : weewx.US,
@@ -251,7 +265,6 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 				logging.error(DRIVER_NAME + " driver had an error sending data to weewx.")
 				syslog.syslog("Error caught was: %s" % e)
 				logging.error("Error caught was: %s" % e)
-				pass
 
 			# Sleepy Time
 			logging.debug("Going to sleep")
