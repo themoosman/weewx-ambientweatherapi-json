@@ -15,6 +15,8 @@ import weedb
 import weewx.drivers
 import weeutil.weeutil
 import weewx.wxformulas
+import os.path
+from os import path
 
 DRIVER_NAME = 'ambientweatherapi'
 DRIVER_VERSION = '0.1'
@@ -132,7 +134,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 				#get the first device
 				devices = weather.get_devices()
 				logging.debug("Got weather devices")
-				
+
 				if not devices:
 					logging.error('AmbientAPI get_devices() returned empty dict')
 					raise Exception('AmbientAPI get_devices() returned empty dict')
@@ -199,10 +201,10 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 				dailyrainin = data["dailyrainin"]
 				weeklyrainin = data["weeklyrainin"]
 				monthlyrainin = data["monthlyrainin"]
-				yearlyrainin = data["yearlyrainin"]
+				#yearlyrainin = data["yearlyrainin"]
 				totalrainin = data["totalrainin"]
 				#other
-				pm25 = self.get_value(data, "pm25")
+				#pm25 = self.get_value(data, "pm25")
 
 			except Exception as e:
 				syslog.syslog(DRIVER_NAME + " driver encountered an error.")
@@ -217,6 +219,31 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 				if error_occured:
 					error_occured = False
 					raise Exception('Previous error occured, skipping packet build.')
+
+				# Read previous daily rain total, and write most recent daily rain back to file
+				if path.exists('rain.txt') == True:
+					print('Opening file')
+					intervalRain = open('/Users/Shared/weewx/rain.txt', 'r')
+					try:
+						lastRain = float(intervalRain.read())
+					except ValueError:
+						print('String value found instead. Assuming zero interval rain and recording current value')
+						lastRain = self.get_float(dailyrainin)
+					intervalRain.close()
+					print('Previous daily rain: ', lastRain)
+				else:
+					print('No previous value found for rain, assuming interval of 0 and recording daily value')
+					lastRain = self.get_float(dailyrainin)
+				print('Reported daily rain: ', self.get_float(dailyrainin))
+				if lastRain > self.get_float(dailyrainin):
+					correctedRain = self.get_float(dailyrainin)
+					print('Recorded rain is more than reported rain; using reported rain')
+				else:
+					correctedRain = self.get_float(dailyrainin) - lastRain
+				print('Calculated interval rain: ', correctedRain)
+				intervalRain = open('/Users/Shared/weewx/rain.txt', 'w')
+				intervalRain.write(str(dailyrainin))
+				intervalRain.close()
 
 				_packet = {
 					'dateTime' : current_observation,
@@ -244,9 +271,10 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 					'batt1' : self.get_float(batt1),
 					'batt2' : self.get_float(batt2),
 					'batt3' : self.get_float(batt3),
-					'pressure' : self.get_float(baromrelin),
-					'barometer' : self.get_float(baromabsin),
-					'rain': dailyrainin,
+					'pressure' : self.get_float(baromabsin),
+					'barometer' : self.get_float(baromrelin),
+					'rain': correctedRain, 
+					'rainRate': self.get_float(hourlyrainin),
 					'windDir' : self.get_float(winddir),
 					'windSpeed' : self.get_float(windspeedmph),
 					'windGust' : self.get_float(windgustmph),
@@ -254,7 +282,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 					'UV' : self.get_float(uv),
 					'outTempBatteryStatus' : self.get_float(battout),
 					'inTempBatteryStatus' : self.get_float(battin),
-					'pm25' : self.get_float(pm25)
+					#'pm25' : self.get_float(pm25)
 				}
 				#self.print_dict(_packet)
 				logging.debug("============Completed Packet Build============")
@@ -271,8 +299,6 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 			time.sleep(self.loop_interval)
 			logging.debug("Mom, I'm up!")
 
-# To test this driver, run it directly as follows:
-# PYTHONPATH=/home/weewx/bin python /home/weewx/bin/user/ambientweatherapi.py
 if __name__ == "__main__":
 	driver = AmbientWeatherAPI()
 	for packet in driver.genLoopPackets():
