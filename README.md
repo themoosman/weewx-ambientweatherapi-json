@@ -33,5 +33,4 @@ The following table outlines the `weewx.conf` station variables.
 | driver | Don't change this value |
 
 ## TODO
-1) Make the reading of external sensors more elegant.
-2) Automate the install using `wee_extension`
+1) Automate the install using `wee_extension`
