@@ -184,25 +184,25 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 				dewPoint3 = self.get_value(data, "dewPoint3")
 				#pressure
 				baromrelin = data["baromrelin"] #relative
-				baromabsin = data["baromabsin"] #pressure
+				baromabsin = data["baromabsin"] #absolute
 				#wind
 				winddir = data["winddir"]
 				windspeedmph = data["windspeedmph"]
 				windgustmph = data["windgustmph"]
-				maxdailygust = data["maxdailygust"]
+				##maxdailygust = data["maxdailygust"]
 				#solar
 				solarradiation = data["solarradiation"]
 				uv = data["uv"]
 				#rain
-				hourlyrainin = data["hourlyrainin"]
-				eventrainin = data["eventrainin"]
+				##hourlyrainin = data["hourlyrainin"]
+				##eventrainin = data["eventrainin"]
 				dailyrainin = data["dailyrainin"]
-				weeklyrainin = data["weeklyrainin"]
-				monthlyrainin = data["monthlyrainin"]
-				yearlyrainin = data["yearlyrainin"]
-				totalrainin = data["totalrainin"]
+				##weeklyrainin = data["weeklyrainin"]
+				##monthlyrainin = data["monthlyrainin"]
+				##yearlyrainin = data["yearlyrainin"]
+				##totalrainin = data["totalrainin"]
 				#other
-				pm25 = self.get_value(data, "pm25")
+				##pm25 = self.get_value(data, "pm25")
 
 			except Exception as e:
 				syslog.syslog(DRIVER_NAME + " driver encountered an error.")
@@ -244,8 +244,8 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 					'batt1' : self.get_float(batt1),
 					'batt2' : self.get_float(batt2),
 					'batt3' : self.get_float(batt3),
-					'pressure' : self.get_float(baromrelin),
-					'barometer' : self.get_float(baromabsin),
+					'pressure' : self.get_float(baromabsin), # relative
+					'barometer' : self.get_float(baromrelin), # absolute
 					'rain': dailyrainin,
 					'windDir' : self.get_float(winddir),
 					'windSpeed' : self.get_float(windspeedmph),
@@ -253,8 +253,8 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 					'radiation' : self.get_float(solarradiation),
 					'UV' : self.get_float(uv),
 					'outTempBatteryStatus' : self.get_float(battout),
-					'inTempBatteryStatus' : self.get_float(battin),
-					'pm25' : self.get_float(pm25)
+					'inTempBatteryStatus' : self.get_float(battin)
+					#'pm25' : self.get_float(pm25)
 				}
 				#self.print_dict(_packet)
 				logging.debug("============Completed Packet Build============")
