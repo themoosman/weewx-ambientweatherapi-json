@@ -17,7 +17,7 @@ import weeutil.weeutil
 import weewx.wxformulas
 
 DRIVER_NAME = 'ambientweatherapi'
-DRIVER_VERSION = '0.1'
+DRIVER_VERSION = '0.2'
 
 def loader(config_dict, engine):
 	station = AmbientWeatherAPI(**config_dict[DRIVER_NAME])
@@ -33,7 +33,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 		self.log_level = stn_dict.get('log_level', 'ERROR')
 
 		if self.log_file and self.log_level != 'console':
-				logging.basicConfig(format='%(asctime)s::%(levelname)s::%(message)s', filemode='w', filename=self.log_file, level=getattr(logging, self.log_level.upper(), 'ERROR'))
+			logging.basicConfig(format='%(asctime)s::%(levelname)s::%(message)s', filemode='w', filename=self.log_file, level=getattr(logging, self.log_level.upper(), 'ERROR'))
 
 		self.api_url = stn_dict.get('api_url', 'https://api.ambientweather.net/v1')
 		self.api_key = stn_dict.get('api_key')
@@ -94,7 +94,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 
 	def get_float(self, value):
 		"""Checks if a value is not, if not it performs a converstion to a float()"""
-		logging.debug("calling: get_float")
+		#logging.debug("calling: get_float")
 		if value is None:
 			return value
 		else:
@@ -102,14 +102,76 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 
 	def get_battery_status(self, value):
 		"""Converts the AM API battery status to somthing weewx likes."""
-		logging.debug("calling: get_battery_status")
+		#logging.debug("calling: get_battery_status")
 		if value is None:
 			return None
 		if (value <= 0):
 			return 1.0
 		else:
 			return 0.0
-	
+	def get_packet_mapping(self):
+		"""Gets the mapping of weewx values (key) to AmbientAPI values (value)."""
+		return {
+				'outTemp' : 'tempf',
+				'inTemp' : 'tempinf',
+				'extraTemp1' : 'temp1f',
+				'extraTemp2' : 'temp2f',
+				'extraTemp3' : 'temp3f',
+				'extraTemp4' : 'temp4f',
+				'extraTemp5' : 'temp5f',
+				'extraTemp6' : 'temp6f',
+				'extraTemp7' : 'temp7f',
+				'extraTemp8' : 'temp8f',
+				'outHumidity' : 'humidity',
+				'inHumidity' : 'humidityin',
+				'extraHumid1' : 'humidity1',
+				'extraHumid2' : 'humidity2',
+				'extraHumid3' : 'humidity3',
+				'extraHumid4' : 'humidity4',
+				'extraHumid5' : 'humidity5',
+				'extraHumid6' : 'humidity6',
+				'extraHumid7' : 'humidity7',
+				'extraHumid8' : 'humidity8',
+				'feelsLike' : 'feelsLike',
+				'feelsLikein' : 'feelsLikein',
+				'feelsLike1' : 'feelsLike1',
+				'feelsLike2' : 'feelsLike2',
+				'feelsLike3' : 'feelsLike3',
+				'feelsLike4' : 'feelsLike4',
+				'feelsLike5' : 'feelsLike5',
+				'feelsLike6' : 'feelsLike6',
+				'feelsLike7' : 'feelsLike7',
+				'feelsLike8' : 'feelsLike8',
+				'dewPoint' : 'dewPoint',
+				'dewPointin' : 'dewPointin',
+				'extraDewpoint1' : 'dewPoint1',
+				'extraDewpoint2' : 'dewPoint2',
+				'extraDewpoint3' : 'dewPoint3',
+				'extraDewpoint4' : 'dewPoint4',
+				'extraDewpoint5' : 'dewPoint5',
+				'extraDewpoint6' : 'dewPoint6',
+				'extraDewpoint7' : 'dewPoint7',
+				'extraDewpoint8' : 'dewPoint8',
+				'batt1' : 'batt1',
+				'batt2' : 'batt2',
+				'batt3' : 'batt3',
+				'batt4' : 'batt4',
+				'batt5' : 'batt5',
+				'batt6' : 'batt6',
+				'batt7' : 'batt7',
+				'batt8' : 'batt8',
+				'pressure' : 'baromabsin',
+				'barometer' : 'baromrelin',
+				'rain': 'dailyrainin',
+				'windDir' : 'winddir',
+				'windSpeed' : 'windspeedmph',
+				'windGust' : 'windgustmph',
+				'radiation' : 'solarradiation',
+				'UV' : 'uv',
+				'outTempBatteryStatus' : 'battout',
+				'inTempBatteryStatus' : 'battin',
+				'pm25' : 'pm25'
+			}
 
 
 	def genLoopPackets(self):
@@ -139,7 +201,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 				else:
 					logging.debug('Weather get_devices() payload not empty')
 
-				#get the last report
+				#get the last report dict
 				data = devices[0].last_data
 				#info = devices[0].info
 				logging.debug("Got last report")
@@ -148,61 +210,8 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 				current_observation = self.convert_epoch_ms_to_sec(data["dateutc"])
 
 				#output the observation
-				# logging.debug("Print Dict")
-				# self.print_dict(data)
-
-				##parse the Data
-				#battery
-				battout = self.get_battery_status(self.get_value(data, "battout"))
-				battin = self.get_battery_status(self.get_value(data, "battin"))
-				batt1 = self.get_battery_status(self.get_value(data, "batt1"))
-				batt2 = self.get_battery_status(self.get_value(data, "batt2"))
-				batt3 = self.get_battery_status(self.get_value(data, "batt3"))
-				#temp
-				tempf = self.get_value(data, "tempf")
-				tempinf= self.get_value(data, "tempinf")
-				temp1f = self.get_value(data, "temp1f")
-				temp2f = self.get_value(data, "temp2f")
-				temp3f = self.get_value(data, "temp3f")
-				#humidity
-				humidity = self.get_value(data, "humidity")
-				humidityin = self.get_value(data, "humidityin")
-				humidity1 = self.get_value(data, "humidity1")
-				humidity2 = self.get_value(data, "humidity2")
-				humidity3 = self.get_value(data, "humidity3")
-				#feelsLike
-				feelsLike = self.get_value(data, "feelsLike")
-				feelsLikein = self.get_value(data, "feelsLikein")
-				feelsLike1 = self.get_value(data, "feelsLike1")
-				feelsLike2 = self.get_value(data, "feelsLike2")
-				feelsLike3 = self.get_value(data, "feelsLike3")
-				#dewpoint
-				dewPoint = self.get_value(data, "dewPoint")
-				dewPointin = self.get_value(data, "dewPointin")
-				dewPoint1 = self.get_value(data, "dewPoint1")
-				dewPoint2 = self.get_value(data, "dewPoint2")
-				dewPoint3 = self.get_value(data, "dewPoint3")
-				#pressure
-				baromrelin = data["baromrelin"] #relative
-				baromabsin = data["baromabsin"] #absolute
-				#wind
-				winddir = data["winddir"]
-				windspeedmph = data["windspeedmph"]
-				windgustmph = data["windgustmph"]
-				##maxdailygust = data["maxdailygust"]
-				#solar
-				solarradiation = data["solarradiation"]
-				uv = data["uv"]
-				#rain
-				##hourlyrainin = data["hourlyrainin"]
-				##eventrainin = data["eventrainin"]
-				dailyrainin = data["dailyrainin"]
-				##weeklyrainin = data["weeklyrainin"]
-				##monthlyrainin = data["monthlyrainin"]
-				##yearlyrainin = data["yearlyrainin"]
-				##totalrainin = data["totalrainin"]
-				#other
-				##pm25 = self.get_value(data, "pm25")
+				if logging.DEBUG >= logging.root.level:
+					self.print_dict(data)
 
 			except Exception as e:
 				syslog.syslog(DRIVER_NAME + " driver encountered an error.")
@@ -218,45 +227,26 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 					error_occured = False
 					raise Exception('Previous error occured, skipping packet build.')
 
+				# Create the initial packet dict
 				_packet = {
 					'dateTime' : current_observation,
-					'usUnits' : weewx.US,
-					'outTemp' : self.get_float(tempf),
-					'inTemp' : self.get_float(tempinf),
-					'extraTemp1' : self.get_float(temp1f),
-					'extraTemp2' : self.get_float(temp2f),
-					'extraTemp3' : self.get_float(temp3f),
-					'outHumidity' : self.get_float(humidity),
-					'inHumidity' : self.get_float(humidityin),
-					'extraHumid1' : self.get_float(humidity1),
-					'extraHumid2' : self.get_float(humidity2),
-					'extraHumid3' : self.get_float(humidity3),
-					'feelsLike' : self.get_float(feelsLike),
-					'feelsLikein' : self.get_float(feelsLikein),
-					'feelsLike1' : self.get_float(feelsLike1),
-					'feelsLike2' : self.get_float(feelsLike2),
-					'feelsLike3' : self.get_float(feelsLike3),
-					'dewPoint' : self.get_float(dewPoint),
-					'dewPointin' : self.get_float(dewPointin),
-					'extraDewpoint1' : self.get_float(dewPoint1),
-					'extraDewpoint2' : self.get_float(dewPoint2),
-					'extraDewpoint3' : self.get_float(dewPoint3),
-					'batt1' : self.get_float(batt1),
-					'batt2' : self.get_float(batt2),
-					'batt3' : self.get_float(batt3),
-					'pressure' : self.get_float(baromabsin), # relative
-					'barometer' : self.get_float(baromrelin), # absolute
-					'rain': dailyrainin,
-					'windDir' : self.get_float(winddir),
-					'windSpeed' : self.get_float(windspeedmph),
-					'windGust' : self.get_float(windgustmph),
-					'radiation' : self.get_float(solarradiation),
-					'UV' : self.get_float(uv),
-					'outTempBatteryStatus' : self.get_float(battout),
-					'inTempBatteryStatus' : self.get_float(battin)
-					#'pm25' : self.get_float(pm25)
+					'usUnits' : weewx.US
 				}
-				#self.print_dict(_packet)
+				#Key is weewx packet, value is Ambient value
+				mapping = self.get_packet_mapping()
+				for key, value in mapping.items():
+					is_batery = value.startswith('batt')
+					if value in data:
+						logging.debug("Setting Weewx value: '%s' to: %s using Ambient field: '%s'" % (key, str(data[value]), value))
+						if is_batery:
+							_packet[key] = self.get_battery_status(data[value])
+						else:
+							_packet[key] = self.get_float(data[value])
+					else:
+						logging.info("Dropping Ambient value: '%s' from Weewx packet." % (value))
+
+				#if logging.DEBUG >= logging.root.level:
+				#	self.print_dict(_packet)
 				logging.debug("============Completed Packet Build============")
 				yield _packet
 				logging.info("loopPacket Accepted")
