@@ -222,25 +222,25 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 
 				# Read previous daily rain total, and write most recent daily rain back to file
 				if path.exists('rain.txt') == True:
-					print('Opening file')
+					logging.debug('Opening file')
 					intervalRain = open('/Users/Shared/weewx/rain.txt', 'r')
 					try:
 						lastRain = float(intervalRain.read())
 					except ValueError:
-						print('String value found instead. Assuming zero interval rain and recording current value')
+						logging.debug('String value found instead. Assuming zero interval rain and recording current value')
 						lastRain = self.get_float(dailyrainin)
 					intervalRain.close()
-					print('Previous daily rain: ', lastRain)
+					logging.debug('Previous daily rain: ', lastRain)
 				else:
-					print('No previous value found for rain, assuming interval of 0 and recording daily value')
+					logging.debug('No previous value found for rain, assuming interval of 0 and recording daily value')
 					lastRain = self.get_float(dailyrainin)
-				print('Reported daily rain: ', self.get_float(dailyrainin))
+				logging.debug('Reported daily rain: ', self.get_float(dailyrainin))
 				if lastRain > self.get_float(dailyrainin):
 					correctedRain = self.get_float(dailyrainin)
-					print('Recorded rain is more than reported rain; using reported rain')
+					logging.debug('Recorded rain is more than reported rain; using reported rain')
 				else:
 					correctedRain = self.get_float(dailyrainin) - lastRain
-				print('Calculated interval rain: ', correctedRain)
+				logging.debug('Calculated interval rain: ', correctedRain)
 				intervalRain = open('/Users/Shared/weewx/rain.txt', 'w')
 				intervalRain.write(str(dailyrainin))
 				intervalRain.close()
