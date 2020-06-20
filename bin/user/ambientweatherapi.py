@@ -18,6 +18,10 @@ import weewx.wxformulas
 import os.path
 from os import path
 
+this_file = os.path.join(os.getcwd(), __file__)
+this_dir = os.path.abspath(os.path.dirname(this_file))
+os.chdir(this_dir)
+
 DRIVER_NAME = 'ambientweatherapi'
 DRIVER_VERSION = '0.1'
 
