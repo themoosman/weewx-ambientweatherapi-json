@@ -245,8 +245,8 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 					else:
 						logging.info("Dropping Ambient value: '%s' from Weewx packet." % (value))
 
-				#if logging.DEBUG >= logging.root.level:
-				#	self.print_dict(_packet)
+				if logging.DEBUG >= logging.root.level:
+					self.print_dict(_packet)
 				logging.debug("============Completed Packet Build============")
 				yield _packet
 				logging.info("loopPacket Accepted")
