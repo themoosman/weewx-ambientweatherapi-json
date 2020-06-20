@@ -163,6 +163,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 				'pressure' : 'baromabsin',
 				'barometer' : 'baromrelin',
 				'rain': 'dailyrainin',
+				'rainRate': 'hourlyrainin',
 				'windDir' : 'winddir',
 				'windSpeed' : 'windspeedmph',
 				'windGust' : 'windgustmph',
