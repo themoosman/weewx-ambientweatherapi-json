@@ -11,10 +11,10 @@ def main():
     internal_humidity = 33.00
     internal_dewpoint = 34.80
 
-    external_temp_c = (external_temp_f - 32) * 5.0/9.0
+    external_temp_c = (external_temp_f - 32) * 5.0 / 9.0
     print("external temp 1: " + str(external_temp_c))
 
-    internal_temp_c = (internal_temp_f - 32) * 5.0/9.0
+    internal_temp_c = (internal_temp_f - 32) * 5.0 / 9.0
     print("internal temp 2: " + str(internal_temp_c))
 
     method1 = calc_target_humidity(external_temp_c, external_humidity, internal_temp_c, internal_humidity)
@@ -88,9 +88,9 @@ def determine_target_humidity(inside_temp, inside_dew, outside_temp):
     if inside_dew >= max_dew:
         return max_humid
 
-    target_humidity = calculate_humidity(inside_temp, (max_dew - 32) * 5.0/9.0)
+    target_humidity = calculate_humidity(inside_temp, (max_dew - 32) * 5.0 / 9.0)
     print("target1: " + str(target_humidity))
-    target_humidity = math.floor(target_humidity/inc)*inc
+    target_humidity = math.floor(target_humidity / inc) * inc
     print("target2: " + str(target_humidity))
 
     dp = calculate_depoint(inside_temp, target_humidity)
