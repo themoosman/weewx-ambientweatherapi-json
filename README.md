@@ -10,7 +10,7 @@ This driver only works with Weewx 4.0+ and Python3.
 
 1) Install the necessary Python packages
 ````bash
-sudo -H pip3 install ambient_api
+sudo -H pip3 install -r requirements.txt
 ````
 
 2) Copy `bin/user/ambientweatherapi.py` to the `bin/user` directory.  The directory location depends on your install type.  See [here](http://www.weewx.com/docs/) for more informaiton.

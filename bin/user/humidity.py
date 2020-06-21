@@ -1,11 +1,8 @@
-import time
-import json
-import syslog
-import logging
 import math
 
 safe_humidity = 60
 max_humidity = 38
+
 
 def main():
     external_temp_f = 27.70
@@ -16,7 +13,7 @@ def main():
 
     external_temp_c = (external_temp_f - 32) * 5.0/9.0
     print("external temp 1: " + str(external_temp_c))
-    
+
     internal_temp_c = (internal_temp_f - 32) * 5.0/9.0
     print("internal temp 2: " + str(internal_temp_c))
 
@@ -26,9 +23,10 @@ def main():
     method2 = determine_target_humidity(internal_temp_c, internal_dewpoint, external_temp_c)
     print("method2: " + str(method2))
 
+
 def calculate_depoint(temp, humidity):
     c = temp
-    rh =humidity
+    rh = humidity
     if c >= 0:
         a = 7.5
     else:
@@ -42,7 +40,7 @@ def calculate_depoint(temp, humidity):
     sp = rh / 100 * ssp
     v = math.log(sp / 6.1078, 10)
     dew = round(b * v / (a - v), 1)
-    #print("dew point: " + str(dew))
+    # print("dew point: " + str(dew))
     return dew
 
 
@@ -60,7 +58,7 @@ def calculate_humidity(temp, dew_point):
         b = 240.7
 
     tssp = 6.1078 * pow(10, (a * c) / (b + c))
-    
+
     if dew_point >= 0:
         a = 7.5
     else:
@@ -72,12 +70,13 @@ def calculate_humidity(temp, dew_point):
         b = 240.7
 
     dssp = 6.1078 * pow(10, (a * dp) / (b + dp))
-    
+
     rh = round(100 * dssp / tssp, 1)
-    
-    #print("calculated humidity: " + str(rh))
+
+    # print("calculated humidity: " + str(rh))
 
     return rh
+
 
 def determine_target_humidity(inside_temp, inside_dew, outside_temp):
     inc = 5.0
@@ -88,12 +87,12 @@ def determine_target_humidity(inside_temp, inside_dew, outside_temp):
 
     if inside_dew >= max_dew:
         return max_humid
-        
+
     target_humidity = calculate_humidity(inside_temp, (max_dew - 32) * 5.0/9.0)
     print("target1: " + str(target_humidity))
     target_humidity = math.floor(target_humidity/inc)*inc
     print("target2: " + str(target_humidity))
-    
+
     dp = calculate_depoint(inside_temp, target_humidity)
     print("int dew point: " + str(dp))
     while dp - outside_temp > max_dp_delta and target_humidity > min_humid:
@@ -101,10 +100,11 @@ def determine_target_humidity(inside_temp, inside_dew, outside_temp):
         print("target: " + str(target_humidity))
         dp = calculate_depoint(inside_temp, target_humidity)
 
-    #target_humidity = min(target_humidity, max_humid)
-    #target_humidity = max(target_humidity, min_humid)
+    # target_humidity = min(target_humidity, max_humid)
+    # target_humidity = max(target_humidity, min_humid)
     print("target humidity" + str(target_humidity))
     return target_humidity
+
 
 def calc_target_humidity(external_temp_c, external_humidity, internal_temp_c, internal_humidity):
     """Converts the optimal indoor humidity.  Drop target humidity 5% for every 5degree C drop below 0"""
@@ -123,5 +123,6 @@ def calc_target_humidity(external_temp_c, external_humidity, internal_temp_c, in
             target = target + 2.5
         return target
 
-if __name__== "__main__":
-  main()
+
+if __name__ == "__main__":
+    main()
