@@ -1,3 +1,4 @@
+![](https://github.com/themoosman/weewx-ambientweatherapi-json/workflows/flake8%20Lint/badge.svg)
 # weewx AmbientWeather API Driver
 
 This is an AmbientWeather API driver for weewx.  This will work with any AmbientWeather stations that uploads data to ambientweather.net.  I decided to go this route as the only way to get access to some infomration is via the Ambinent Weather API.  Since I have a number of external temperature sensors I wrote this driver so I could pull that data into weewx.
@@ -10,7 +11,7 @@ This driver only works with Weewx 4.0+ and Python3.
 
 1) Install the necessary Python packages
 ````bash
-sudo -H pip3 install ambient_api
+sudo -H pip3 install -r requirements.txt
 ````
 
 2) Copy `bin/user/ambientweatherapi.py` to the `bin/user` directory.  The directory location depends on your install type.  See [here](http://www.weewx.com/docs/) for more informaiton.
@@ -33,5 +34,4 @@ The following table outlines the `weewx.conf` station variables.
 | driver | Don't change this value |
 
 ## TODO
-1) Make the reading of external sensors more elegant.
-2) Automate the install using `wee_extension`
+1) Automate the install using `wee_extension`
