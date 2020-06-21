@@ -236,15 +236,15 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
                 if error_occured:
                     error_occured = False
                     raise Exception('Previous error occured, skipping packet build.')
-                    
+
                 # Read previous daily rain total, and write most recent daily rain back to file
-                if path.exists('rain.txt') == True:
+                if path.exists('rain.txt'):
                     logging.debug('Opening file')
                     intervalRain = open('rain.txt', 'r')
                     try:
                         lastRain = float(intervalRain.read())
                     except ValueError:
-                        logging.debug('String value found instead. Assuming zero interval rain and recording current value')
+                        logging.debug('String value found. Assuming zero interval rain and recording current value')
                         lastRain = self.get_float(data['dailyrainin'])
                     intervalRain.close()
                     logging.debug('Previous daily rain: ', lastRain)
@@ -262,7 +262,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
                 intervalRain = open('rain.txt', 'w')
                 intervalRain.write(str(data['dailyrainin']))
                 intervalRain.close()
-                    
+
                 # Create the initial packet dict
                 _packet = {
                     'dateTime': current_observation,
@@ -298,6 +298,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
             logging.debug("Going to sleep")
             time.sleep(self.loop_interval)
             logging.debug("Mom, I'm up!")
+
 
 if __name__ == "__main__":
     driver = AmbientWeatherAPI()
