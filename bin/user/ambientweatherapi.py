@@ -245,21 +245,22 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
                         lastRain = float(intervalRain.read())
                     except ValueError:
                         logging.debug('String value found instead. Assuming zero interval rain and recording current value')
-                        lastRain = self.get_float(dailyrainin)
+                        lastRain = self.get_float(data['dailyrainin'])
                     intervalRain.close()
                     logging.debug('Previous daily rain: ', lastRain)
                 else:
                     logging.debug('No previous value found for rain, assuming interval of 0 and recording daily value')
-                    lastRain = self.get_float(dailyrainin)
-                logging.debug('Reported daily rain: ', self.get_float(dailyrainin))
-                if lastRain > self.get_float(dailyrainin):
-                    correctedRain = self.get_float(dailyrainin)
+                    lastRain = self.get_float(data['dailyrainin'])
+                logging.debug('Reported daily rain: %s' % str(data['dailyrainin']))
+                if lastRain > self.get_float(data['dailyrainin']):
+                    correctedRain = self.get_float(data['dailyrainin'])
                     logging.debug('Recorded rain is more than reported rain; using reported rain')
                 else:
-                    correctedRain = self.get_float(dailyrainin) - lastRain
-                logging.debug('Calculated interval rain: ', correctedRain)
+                    correctedRain = self.get_float(data['dailyrainin']) - lastRain
+
+                logging.debug('Calculated interval rain: %s' % correctedRain)
                 intervalRain = open('rain.txt', 'w')
-                intervalRain.write(str(dailyrainin))
+                intervalRain.write(str(data['dailyrainin']))
                 intervalRain.close()
                     
                 # Create the initial packet dict
@@ -280,7 +281,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
                         else:
                             _packet[key] = self.get_float(data[value])
                     else:
-                        logging.info("Dropping Ambient value: '%s' from Weewx packet." % (value))
+                        logging.debug("Dropping Ambient value: '%s' from Weewx packet." % (value))
 
                 if logging.DEBUG >= logging.root.level:
                     self.print_dict(_packet)
