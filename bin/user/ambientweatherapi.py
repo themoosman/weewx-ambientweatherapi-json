@@ -14,6 +14,12 @@ import weedb
 import weewx.drivers
 import weeutil.weeutil
 import weewx.wxformulas
+import os.path
+from os import path
+
+this_file = os.path.join(os.getcwd(), __file__)
+this_dir = os.path.abspath(os.path.dirname(this_file))
+os.chdir(this_dir)
 
 DRIVER_NAME = 'ambientweatherapi'
 DRIVER_VERSION = '0.2'
@@ -165,7 +171,6 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
             'batt8': 'batt8',
             'pressure': 'baromabsin',
             'barometer': 'baromrelin',
-            'rain': 'dailyrainin',
             'rainRate': 'hourlyrainin',
             'windDir': 'winddir',
             'windSpeed': 'windspeedmph',
@@ -232,24 +237,51 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
                     error_occured = False
                     raise Exception('Previous error occured, skipping packet build.')
 
+                # Read previous daily rain total, and write most recent daily rain back to file
+                if path.exists('rain.txt'):
+                    logging.debug('Opening file')
+                    intervalRain = open('rain.txt', 'r')
+                    try:
+                        lastRain = float(intervalRain.read())
+                    except ValueError:
+                        logging.debug('String value found. Assuming zero interval rain and recording current value')
+                        lastRain = self.get_float(data['dailyrainin'])
+                    intervalRain.close()
+                    logging.debug('Previous daily rain: ', lastRain)
+                else:
+                    logging.debug('No previous value found for rain, assuming interval of 0 and recording daily value')
+                    lastRain = self.get_float(data['dailyrainin'])
+                logging.debug('Reported daily rain: %s' % str(data['dailyrainin']))
+                if lastRain > self.get_float(data['dailyrainin']):
+                    correctedRain = self.get_float(data['dailyrainin'])
+                    logging.debug('Recorded rain is more than reported rain; using reported rain')
+                else:
+                    correctedRain = self.get_float(data['dailyrainin']) - lastRain
+
+                logging.debug('Calculated interval rain: %s' % correctedRain)
+                intervalRain = open('rain.txt', 'w')
+                intervalRain.write(str(data['dailyrainin']))
+                intervalRain.close()
+
                 # Create the initial packet dict
                 _packet = {
                     'dateTime': current_observation,
-                    'usUnits': weewx.US
+                    'usUnits': weewx.US,
+                    'rain': correctedRain,
                 }
                 # Key is weewx packet, value is Ambient value
                 mapping = self.get_packet_mapping()
                 for key, value in mapping.items():
-                    is_batery = value.startswith('batt')
+                    is_battery = value.startswith('batt')
                     if value in data:
                         logging.debug("Setting Weewx value: '%s' to: %s using Ambient field: '%s'" %
                                       (key, str(data[value]), value))
-                        if is_batery:
+                        if is_battery:
                             _packet[key] = self.get_battery_status(data[value])
                         else:
                             _packet[key] = self.get_float(data[value])
                     else:
-                        logging.info("Dropping Ambient value: '%s' from Weewx packet." % (value))
+                        logging.debug("Dropping Ambient value: '%s' from Weewx packet." % (value))
 
                 if logging.DEBUG >= logging.root.level:
                     self.print_dict(_packet)
@@ -268,8 +300,6 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
             logging.debug("Mom, I'm up!")
 
 
-# To test this driver, run it directly as follows:
-# PYTHONPATH=/home/weewx/bin python /home/weewx/bin/user/ambientweatherapi.py
 if __name__ == "__main__":
     driver = AmbientWeatherAPI()
     for packet in driver.genLoopPackets():
