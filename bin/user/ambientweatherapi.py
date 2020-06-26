@@ -123,28 +123,28 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
         correctedRain = dailyrainin
         try:
             if path.exists(self.rainfilepath):
-                logging.debug('Opening file: %s' % (self.rainfilepath))
+                logging.info('Opening file: %s' % (self.rainfilepath))
                 intervalRain = open(self.rainfilepath, 'r')
                 try:
                     lastRain = float(intervalRain.read())
                 except ValueError:
-                    logging.debug('String value found. Assuming zero interval rain and recording current value')
+                    logging.info('String value found. Assuming zero interval rain and recording current value')
                     lastRain = dailyrainin
                 intervalRain.close()
-                logging.debug('Previous daily rain: %s' % lastRain)
+                logging.info('Previous daily rain: %s' % lastRain)
             else:
-                logging.debug('No previous value found for rain, assuming interval of 0 and recording daily value')
+                logging.info('No previous value found for rain, assuming interval of 0 and recording daily value')
                 lastRain = dailyrainin
 
-            logging.debug('Reported daily rain: %s' % str(dailyrainin))
+            logging.info('Reported daily rain: %s' % str(dailyrainin))
 
             if lastRain > dailyrainin:
                 correctedRain = dailyrainin
-                logging.debug('Recorded rain is more than reported rain; using reported rain')
+                logging.info('Recorded rain is more than reported rain; using reported rain')
             else:
                 correctedRain = dailyrainin - lastRain
 
-            logging.debug('Calculated interval rain: %s' % correctedRain)
+            logging.info('Calculated interval rain: %s' % correctedRain)
             intervalRain = open(self.rainfilepath, 'w')
             intervalRain.write(str(dailyrainin))
             intervalRain.close()
