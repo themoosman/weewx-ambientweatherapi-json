@@ -14,12 +14,9 @@ import weedb
 import weewx.drivers
 import weeutil.weeutil
 import weewx.wxformulas
+import tempfile
 import os.path
 from os import path
-
-this_file = os.path.join(os.getcwd(), __file__)
-this_dir = os.path.abspath(os.path.dirname(this_file))
-os.chdir(this_dir)
 
 DRIVER_NAME = 'ambientweatherapi'
 DRIVER_VERSION = '0.2'
@@ -34,7 +31,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
     """Custom driver for Ambient Weather API."""
 
     def __init__(self, **stn_dict):
-
+        rainfile = "%s_%s_rain.txt" % (DRIVER_NAME, DRIVER_VERSION)
         self.log_file = stn_dict.get('log_file', None)
         self.loop_interval = float(stn_dict.get('loop_interval', 60))
         self.log_level = stn_dict.get('log_level', 'ERROR')
@@ -51,6 +48,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
         self.station_hardware = stn_dict.get('hardware', 'Undefined')
         self.safe_humidity = float(stn_dict.get('safe_humidity', 60))
         self.max_humidity = float(stn_dict.get('max_humidity', 38))
+        self.rainfilepath = os.path.join(tempfile.gettempdir(), rainfile)
         logging.debug("Exiting init()")
 
     @property
@@ -91,13 +89,15 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 
     def print_dict(self, data_dict):
         """Prints a dict."""
-        logging.debug("calling: print_dict")
-        for key in data_dict:
-            logging.debug(key + " = " + str(data_dict[key]))
+        if logging.DEBUG >= logging.root.level:
+            logging.debug("calling: print_dict")
+            for key in data_dict:
+                logging.debug(key + " = " + str(data_dict[key]))
 
     def get_value(self, data_dict, key):
         """Gets the value from a dict, returns None if the key does not exist."""
-        logging.debug("calling: get_value")
+        if logging.DEBUG >= logging.root.level:
+            logging.debug("calling: get_value")
         return data_dict.get(key, None)
 
     def get_float(self, value):
@@ -117,6 +117,47 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
             return 1.0
         else:
             return 0.0
+
+    def check_rain_rate(self, dailyrainin):
+        """Read previous daily rain total, and write most recent daily rain back to file"""
+        correctedRain = dailyrainin
+        try:
+            if path.exists(self.rainfilepath):
+                logging.debug('Opening file: %s' % (self.rainfilepath))
+                intervalRain = open(self.rainfilepath, 'r')
+                try:
+                    lastRain = float(intervalRain.read())
+                except ValueError:
+                    logging.error('String value found. Assuming zero interval rain and recording current value')
+                    lastRain = dailyrainin
+                intervalRain.close()
+                logging.debug('Previous daily rain: %s' % str(lastRain))
+            else:
+                logging.debug('No previous value found for rain, assuming interval of 0 and recording daily value')
+                lastRain = dailyrainin
+
+            logging.debug('Reported daily rain: %s' % str(dailyrainin))
+
+            if lastRain > dailyrainin:
+                correctedRain = dailyrainin
+                logging.debug('Recorded rain is more than reported rain; using reported rain')
+            else:
+                correctedRain = dailyrainin - lastRain
+                # temp
+                # logging.info('Previous daily rain: %s' % str(lastRain))
+                # logging.info('Reported daily rain: %s' % str(dailyrainin))
+                # logging.info('Calculated interval rain: %s' % str(correctedRain))
+
+            logging.debug('Calculated interval rain: %s' % str(correctedRain))
+            intervalRain = open(self.rainfilepath, 'w')
+            intervalRain.write(str(dailyrainin))
+            intervalRain.close()
+
+        except Exception as e:
+            logging.error("%s driver, function: %s encountered an error." % (DRIVER_NAME, "check_rain_rate"))
+            logging.error("Error caught was: %s" % e)
+        finally:
+            return correctedRain
 
     def get_packet_mapping(self):
         """Gets the mapping of weewx values (key) to AmbientAPI values (value)."""
@@ -220,8 +261,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
                 current_observation = self.convert_epoch_ms_to_sec(data["dateutc"])
 
                 # output the observation
-                if logging.DEBUG >= logging.root.level:
-                    self.print_dict(data)
+                self.print_dict(data)
 
             except Exception as e:
                 syslog.syslog(DRIVER_NAME + " driver encountered an error.")
@@ -237,39 +277,20 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
                     error_occured = False
                     raise Exception('Previous error occured, skipping packet build.')
 
-                # Read previous daily rain total, and write most recent daily rain back to file
-                if path.exists('rain.txt'):
-                    logging.debug('Opening file')
-                    intervalRain = open('rain.txt', 'r')
-                    try:
-                        lastRain = float(intervalRain.read())
-                    except ValueError:
-                        logging.debug('String value found. Assuming zero interval rain and recording current value')
-                        lastRain = self.get_float(data['dailyrainin'])
-                    intervalRain.close()
-                    logging.debug('Previous daily rain: ', lastRain)
-                else:
-                    logging.debug('No previous value found for rain, assuming interval of 0 and recording daily value')
-                    lastRain = self.get_float(data['dailyrainin'])
-                logging.debug('Reported daily rain: %s' % str(data['dailyrainin']))
-                if lastRain > self.get_float(data['dailyrainin']):
-                    correctedRain = self.get_float(data['dailyrainin'])
-                    logging.debug('Recorded rain is more than reported rain; using reported rain')
-                else:
-                    correctedRain = self.get_float(data['dailyrainin']) - lastRain
-
-                logging.debug('Calculated interval rain: %s' % correctedRain)
-                intervalRain = open('rain.txt', 'w')
-                intervalRain.write(str(data['dailyrainin']))
-                intervalRain.close()
+                dailyrainin = 0.0
+                # Check the API for dai
+                if 'dailyrainin' in data.keys():
+                    dailyrainin = self.get_float(data['dailyrainin'])
 
                 # Create the initial packet dict
                 _packet = {
                     'dateTime': current_observation,
                     'usUnits': weewx.US,
-                    'rain': correctedRain,
+                    'rain': self.check_rain_rate(dailyrainin),
                 }
+
                 # Key is weewx packet, value is Ambient value
+                # Loop the values in the mapping and look for actual values in the API data
                 mapping = self.get_packet_mapping()
                 for key, value in mapping.items():
                     is_battery = value.startswith('batt')
@@ -283,8 +304,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
                     else:
                         logging.debug("Dropping Ambient value: '%s' from Weewx packet." % (value))
 
-                if logging.DEBUG >= logging.root.level:
-                    self.print_dict(_packet)
+                self.print_dict(_packet)
                 logging.debug("============Completed Packet Build============")
                 yield _packet
                 logging.info("loopPacket Accepted")
