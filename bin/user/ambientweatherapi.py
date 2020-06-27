@@ -144,9 +144,9 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
             else:
                 correctedRain = dailyrainin - lastRain
                 # temp
-                logging.info('Previous daily rain: %s' % str(lastRain))
-                logging.info('Reported daily rain: %s' % str(dailyrainin))
-                logging.info('Calculated interval rain: %s' % str(correctedRain))
+                # logging.info('Previous daily rain: %s' % str(lastRain))
+                # logging.info('Reported daily rain: %s' % str(dailyrainin))
+                # logging.info('Calculated interval rain: %s' % str(correctedRain))
 
             logging.debug('Calculated interval rain: %s' % str(correctedRain))
             intervalRain = open(self.rainfilepath, 'w')
