@@ -3,7 +3,7 @@
 
 This is an AmbientWeather API driver for weewx.  This will work with any AmbientWeather stations that uploads data to ambientweather.net.  I decided to go this route as the only way to get access to some infomration is via the Ambinent Weather API.  Since I have a number of external temperature sensors I wrote this driver so I could pull that data into weewx.
 
-This driver uses the [AmbientAPI](https://github.com/avryhof/ambient_api) Python3 pakcage to make the API calls.
+This driver uses the [AmbientAPI](https://github.com/avryhof/ambient_api) Python3 package to make the API calls.
 
 This driver only works with Weewx 4.0+ and Python3.
 
