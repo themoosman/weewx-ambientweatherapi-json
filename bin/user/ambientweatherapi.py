@@ -220,7 +220,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
             'UV': 'uv',
             'outTempBatteryStatus': 'battout',
             'inTempBatteryStatus': 'battin',
-            'pm25': 'pm25'
+            'pm2_5': 'pm25'
         }
 
     def genLoopPackets(self):
