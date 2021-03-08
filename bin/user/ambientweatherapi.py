@@ -19,7 +19,7 @@ import os.path
 from os import path
 
 DRIVER_NAME = 'ambientweatherapi'
-DRIVER_VERSION = '0.2'
+DRIVER_VERSION = '0.3'
 
 
 def loader(config_dict, engine):
@@ -51,6 +51,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
         self.use_meteobridge = bool(stn_dict.get('use_meteobridge', False))
         logging.debug('use_meteobridge: %s' % str(self.use_meteobridge))
         self.rainfilepath = os.path.join(tempfile.gettempdir(), rainfile)
+        logging.info('Starting: %s, version: %s' % (DRIVER_NAME, DRIVER_VERSION))
         logging.debug("Exiting init()")
 
     @property
