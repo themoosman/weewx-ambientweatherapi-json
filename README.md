@@ -30,6 +30,7 @@ The following table outlines the `weewx.conf` station variables.
 | api_url | Ambient Weather API endpoint.  You probably don't need to change this. |
 | api_app_key | API Application Key from your ambientweather.net [website](https://ambientweather.docs.apiary.io/#) |
 | api_key | API Key from your ambientweather.net [website](https://ambientweather.docs.apiary.io/#) |
+| use_meteobridge | Set to `True` if using Meteobridge, `False` is the default |
 | hardware | String to identify the hardware used |
 | driver | Don't change this value |
 
