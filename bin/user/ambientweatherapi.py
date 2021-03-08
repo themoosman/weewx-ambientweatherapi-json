@@ -49,7 +49,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
         self.safe_humidity = float(stn_dict.get('safe_humidity', 60))
         self.max_humidity = float(stn_dict.get('max_humidity', 38))
         self.use_meteobridge = bool(stn_dict.get('use_meteobridge', False))
-        logging.debug('use_meteobridge: %s' % str(self.use_meteobridge))
+        logging.info('use_meteobridge: %s' % str(self.use_meteobridge))
         self.rainfilepath = os.path.join(tempfile.gettempdir(), rainfile)
         logging.info('Starting: %s, version: %s' % (DRIVER_NAME, DRIVER_VERSION))
         logging.debug("Exiting init()")
