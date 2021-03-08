@@ -118,11 +118,13 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
             return None
         if (value <= 0):
             if self.use_meteobridge:
+                logging.debug("use_meteobridge flip bit to 0.0")
                 return 0.0
             else:
                 return 1.0
         else:
             if self.use_meteobridge:
+                logging.debug("use_meteobridge flip bit to 1.0")
                 return 1.0
             else:
                 return 0.0
