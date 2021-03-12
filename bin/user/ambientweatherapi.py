@@ -19,7 +19,7 @@ import os.path
 from os import path
 
 DRIVER_NAME = 'ambientweatherapi'
-DRIVER_VERSION = '0.2'
+DRIVER_VERSION = '0.3'
 
 
 def loader(config_dict, engine):
@@ -48,7 +48,10 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
         self.station_hardware = stn_dict.get('hardware', 'Undefined')
         self.safe_humidity = float(stn_dict.get('safe_humidity', 60))
         self.max_humidity = float(stn_dict.get('max_humidity', 38))
+        self.use_meteobridge = bool(stn_dict.get('use_meteobridge', False))
+        logging.info('use_meteobridge: %s' % str(self.use_meteobridge))
         self.rainfilepath = os.path.join(tempfile.gettempdir(), rainfile)
+        logging.info('Starting: %s, version: %s' % (DRIVER_NAME, DRIVER_VERSION))
         logging.debug("Exiting init()")
 
     @property
@@ -114,9 +117,17 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
         if value is None:
             return None
         if (value <= 0):
-            return 1.0
+            if self.use_meteobridge:
+                logging.debug("use_meteobridge flip bit to 0.0")
+                return 0.0
+            else:
+                return 1.0
         else:
-            return 0.0
+            if self.use_meteobridge:
+                logging.debug("use_meteobridge flip bit to 1.0")
+                return 1.0
+            else:
+                return 0.0
 
     def check_rain_rate(self, dailyrainin):
         """Read previous daily rain total, and write most recent daily rain back to file"""
@@ -202,6 +213,14 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
             'extraDewpoint6': 'dewPoint6',
             'extraDewpoint7': 'dewPoint7',
             'extraDewpoint8': 'dewPoint8',
+            'batteryStatus1': 'batt1',
+            'batteryStatus2': 'batt2',
+            'batteryStatus3': 'batt3',
+            'batteryStatus4': 'batt4',
+            'batteryStatus5': 'batt5',
+            'batteryStatus6': 'batt6',
+            'batteryStatus7': 'batt7',
+            'batteryStatus8': 'batt8',
             'batt1': 'batt1',
             'batt2': 'batt2',
             'batt3': 'batt3',
