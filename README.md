@@ -14,7 +14,7 @@ This driver only works with Weewx 4.0+ and Python3.
 sudo -H pip3 install -r requirements.txt
 ````
 
-2) Copy `bin/user/ambientweatherapi.py` to the `bin/user` directory.  The directory location depends on your install type.  See [here](http://www.weewx.com/docs/) or [here](https://weewx.com/docs/usersguide.htm#Where_to_find_things) for more informaiton.
+2) Copy `bin/user/ambientweatherapi.py` to the `bin/user` directory.  The directory location depends on your install type.  See [here](https://weewx.com/docs/usersguide.htm#Where_to_find_things) for more informaiton on how to find your `user` directory.
 3) Modify `weewx.conf` using the snippets in this repo's `weeex.conf`
 4) Restart `weewx`
 
