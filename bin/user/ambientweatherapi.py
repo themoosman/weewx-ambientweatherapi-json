@@ -19,7 +19,7 @@ import os.path
 from os import path
 
 DRIVER_NAME = 'ambientweatherapi'
-DRIVER_VERSION = '0.3'
+DRIVER_VERSION = '0.4'
 
 
 def loader(config_dict, engine):
@@ -232,6 +232,10 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
             'inHumidity': 'humidityin',
             'inTemp': 'tempinf',
             'inTempBatteryStatus': 'battin',
+            'lightning_distance': 'lightning_distance',
+            'lightning_disturber_count': 'lightning_time',
+            'lightning_noise_count': 'lightning_day',
+            'lightning_strike_count': 'lightning_hour',
             'outHumidity': 'humidity',
             'outTemp': 'tempf',
             'outTempBatteryStatus': 'battout',
