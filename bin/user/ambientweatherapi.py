@@ -19,7 +19,7 @@ import os.path
 from os import path
 
 DRIVER_NAME = 'ambientweatherapi'
-DRIVER_VERSION = '0.5'
+DRIVER_VERSION = '0.0.6'
 
 
 def loader(config_dict, engine):
@@ -249,6 +249,10 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
             'soilMoist2': 'soilhum2',
             'soilMoist3': 'soilhum3',
             'soilMoist4': 'soilhum4',
+            'soilMoist5': 'soilhum5',
+            'soilMoist6': 'soilhum6',
+            'soilMoist7': 'soilhum7',
+            'soilMoist8': 'soilhum8',
             'soilTemp1': 'soiltemp1f',
             'soilTemp2': 'soiltemp2f',
             'soilTemp3': 'soiltemp3f',
