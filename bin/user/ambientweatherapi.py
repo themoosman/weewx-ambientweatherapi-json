@@ -19,7 +19,7 @@ import os.path
 from os import path
 
 DRIVER_NAME = 'ambientweatherapi'
-DRIVER_VERSION = '0.4'
+DRIVER_VERSION = '0.0.6'
 
 
 def loader(config_dict, engine):
@@ -232,6 +232,8 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
             'inHumidity': 'humidityin',
             'inTemp': 'tempinf',
             'inTempBatteryStatus': 'battin',
+            'leafWet1': 'leafwetness1',
+            'leafWet2': 'leafwetness2',
             'lightning_distance': 'lightning_distance',
             'lightning_disturber_count': 'lightning_time',
             'lightning_noise_count': 'lightning_day',
@@ -243,6 +245,18 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
             'pressure': 'baromabsin',
             'radiation': 'solarradiation',
             'rainRate': 'hourlyrainin',
+            'soilMoist1': 'soilhum1',
+            'soilMoist2': 'soilhum2',
+            'soilMoist3': 'soilhum3',
+            'soilMoist4': 'soilhum4',
+            'soilMoist5': 'soilhum5',
+            'soilMoist6': 'soilhum6',
+            'soilMoist7': 'soilhum7',
+            'soilMoist8': 'soilhum8',
+            'soilTemp1': 'soiltemp1f',
+            'soilTemp2': 'soiltemp2f',
+            'soilTemp3': 'soiltemp3f',
+            'soilTemp4': 'soiltemp4f',
             'windDir': 'winddir',
             'windGust': 'windgustmph',
             'windSpeed': 'windspeedmph',
