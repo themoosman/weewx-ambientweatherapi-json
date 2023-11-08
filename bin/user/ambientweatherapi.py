@@ -19,7 +19,7 @@ import os.path
 from os import path
 
 DRIVER_NAME = 'ambientweatherapi'
-DRIVER_VERSION = '0.8'
+DRIVER_VERSION = '0.0.8'
 
 
 def loader(config_dict, engine):
