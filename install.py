@@ -15,5 +15,13 @@ class AmbientWeatherApiInstaller(ExtensionInstaller):
             description='WeeWx AmbientWeather API Driver.',
             author="Karl Moos",
             restful_services='user.ambientweatherapi.AmbientWeatherAPI',
+            config={
+                'ambientweatherapi': {
+                    'driver': 'user.ambientweatherapi',
+                    'loop_interval': '120',
+                    'api_url': 'https://api.ambientweather.net/v1',
+                    'api_app_key': 'xxxxxx',
+                    'api_key': 'xxxxxx',
+                    'hardware': 'My Weather Station'}},
             files=[('bin/user', ['bin/user/ambientweatherapi.py'])]
         )
