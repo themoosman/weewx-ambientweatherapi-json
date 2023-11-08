@@ -2,8 +2,10 @@
 
 from weecfg.extension import ExtensionInstaller
 
+
 def loader():
     return AmbientWeatherApiInstaller()
+
 
 class AmbientWeatherApiInstaller(ExtensionInstaller):
     def __init__(self):
@@ -18,4 +20,4 @@ class AmbientWeatherApiInstaller(ExtensionInstaller):
                     'Windy': {
                         'api_key': 'replace_me'}}},
             files=[('bin/user', ['bin/user/ambientweatherapi.py'])]
-            )
+        )
