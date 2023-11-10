@@ -243,7 +243,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
             'outTempBatteryStatus': 'battout',
             'o3': 'aqi_pm25_aqin',
             'pm1_0': 'aqi_pm10_aqin',
-            'pm2_5': 'pm25_in',
+            'pm2_5': 'pm25_in_aqin',
             'pm10_0': 'pm10_in_aqin',
             'pressure': 'baromabsin',
             'radiation': 'solarradiation',
