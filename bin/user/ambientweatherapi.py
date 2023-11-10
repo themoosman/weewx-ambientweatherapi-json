@@ -19,7 +19,7 @@ import os.path
 from os import path
 
 DRIVER_NAME = 'ambientweatherapi'
-DRIVER_VERSION = '0.0.8'
+DRIVER_VERSION = '0.0.10'
 
 
 def loader(config_dict, engine):
@@ -191,7 +191,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
             'batt7': 'batt7',
             'batt8': 'batt8',
             'batt_25': 'batt_25',
-            'co2': 'co2',
+            'co2': 'co2_in_aqin',
             'dewPoint': 'dewPoint',
             'dewPointin': 'dewPointin',
             'extraDewpoint1': 'dewPoint1',
@@ -241,7 +241,10 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
             'outHumidity': 'humidity',
             'outTemp': 'tempf',
             'outTempBatteryStatus': 'battout',
-            'pm2_5': 'pm25',
+            'o3': 'aqi_pm25_aqin',
+            'pm1_0': 'aqi_pm10_aqin',
+            'pm2_5': 'pm25_in',
+            'pm10_0': 'pm10_in_aqin',
             'pressure': 'baromabsin',
             'radiation': 'solarradiation',
             'rainRate': 'hourlyrainin',
