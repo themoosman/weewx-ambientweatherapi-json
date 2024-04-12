@@ -97,18 +97,12 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
         utc_epoch_sec = epoch_ms / 1000
         return utc_epoch_sec
 
-    def print_dict1(self, data_dict):
+    def print_dict(self, data_dict):
         """Prints a dict."""
         if logging.DEBUG >= logging.root.level:
             logging.debug("calling: print_dict")
             for key in data_dict:
                 logging.debug(key + " = " + str(data_dict[key]))
-
-    def print_dict(self, data_dict):
-        """Prints a dict."""
-        logging.info("calling: print_dict")
-        for key in data_dict:
-            logging.info(key + " = " + str(data_dict[key]))
 
     def get_value(self, data_dict, key):
         """Gets the value from a dict, returns None if the key does not exist."""
