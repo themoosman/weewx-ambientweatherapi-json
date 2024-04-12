@@ -50,6 +50,12 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
         self.max_humidity = float(stn_dict.get('max_humidity', 38))
         self.use_meteobridge = bool(stn_dict.get('use_meteobridge', False))
         logging.info('use_meteobridge: %s' % str(self.use_meteobridge))
+        self.station_mac = stn_dict.get('station_mac', '')
+        self.use_station_mac = False
+        if not self.station_mac:
+            logging.info("No Station MAC specified.")
+        else:
+            self.use_station_mac = True
         self.rainfilepath = os.path.join(tempfile.gettempdir(), rainfile)
         logging.info('Starting: %s, version: %s' % (DRIVER_NAME, DRIVER_VERSION))
         logging.debug("Exiting init()")
