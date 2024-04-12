@@ -55,6 +55,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
         if not self.station_mac:
             logging.info("No Station MAC specified.")
         else:
+            logging.info("Using Station MAC: %s" % self.station_mac)
             self.use_station_mac = True
         self.rainfilepath = os.path.join(tempfile.gettempdir(), rainfile)
         logging.info('Starting: %s, version: %s' % (DRIVER_NAME, DRIVER_VERSION))
@@ -308,11 +309,12 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 
                 # get the last report dict
                 data = devices[0].last_data
+                self.print_dict(data)
                 if self.use_station_mac:
                     logging.debug('Looking for specific Station MAC')
                     for device in devices:
                         if device.macAddress == self.station_mac:
-                            logging.info("Found station mac: %s", self.station_mac)
+                            logging.info("Found station mac: %s" % self.station_mac)
                             data = device.last_data
                             break
                         else:
