@@ -106,10 +106,9 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 
     def print_dict(self, data_dict):
         """Prints a dict."""
-        if logging.INFO >= logging.root.level:
-            logging.debug("calling: print_dict")
-            for key in data_dict:
-                logging.debug(key + " = " + str(data_dict[key]))
+        logging.info("calling: print_dict")
+        for key in data_dict:
+            logging.into(key + " = " + str(data_dict[key]))
 
     def get_value(self, data_dict, key):
         """Gets the value from a dict, returns None if the key does not exist."""
