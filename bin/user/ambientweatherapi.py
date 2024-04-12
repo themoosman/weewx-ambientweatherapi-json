@@ -320,7 +320,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
                 if self.use_station_mac:
                     logging.debug('Looking for specific Station MAC')
                     for device in devices:
-                        if device.macAddress == self.station_mac:
+                        if device.mac_address == self.station_mac:
                             logging.info("Found station mac: %s" % self.station_mac)
                             data = device.last_data
                             break
