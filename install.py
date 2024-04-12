@@ -10,7 +10,7 @@ def loader():
 class AmbientWeatherApiInstaller(ExtensionInstaller):
     def __init__(self):
         super(AmbientWeatherApiInstaller, self).__init__(
-            version="0.0.8",
+            version="0.0.11",
             name='ambientweatherapi',
             description='WeeWx AmbientWeather API Driver.',
             author="Karl Moos",
