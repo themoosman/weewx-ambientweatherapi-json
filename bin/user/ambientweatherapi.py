@@ -315,15 +315,12 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 
                 # get the last report dict
                 data = devices[0].last_data
-                logging.info(devices[0])
                 if self.use_station_mac:
                     logging.debug('Looking for specific Station MAC')
-                    length = len(devices)
-                    for i in range(length):
-                        device = devices[i]
+                    for device in devices:
                         if device.mac_address == self.station_mac:
                             logging.info("Found station mac: %s" % self.station_mac)
-                            data = devices[i].last_data
+                            data = device.last_data
                             break
                         else:
                             logging.debug('No specific MAC specified, using first station.')
