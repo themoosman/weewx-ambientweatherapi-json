@@ -38,6 +38,3 @@ The following table outlines the `weewx.conf` station variables.
 | station_mac | Specify a specific station MAC address to return data.  If blank or unspecified, then the first station in the list is returned. |
 | hardware | String to identify the hardware used |
 | driver | Don't change this value |
-
-## TODO
-1) Automate the install using `wee_extension`
