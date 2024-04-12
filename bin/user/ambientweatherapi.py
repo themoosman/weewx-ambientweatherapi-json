@@ -300,7 +300,6 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
                 # get the first device
                 devices = weather.get_devices()
                 logging.debug("Got weather devices")
-
                 if not devices:
                     logging.error('AmbientAPI get_devices() returned empty dict')
                     raise Exception('AmbientAPI get_devices() returned empty dict')
@@ -309,6 +308,15 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 
                 # get the last report dict
                 data = devices[0].last_data
+                if self.use_station_mac:
+                    logging.debug('Looking for specific Station MAC')
+                    for device in devices:
+                        if device.macAddress == self.station_mac:
+                            logging.info("Found station mac: %s", self.station_mac)
+                            data = device.last_data
+                            break
+                        else:
+                            logging.debug('No specific MAC specified, using first station.')
                 # info = devices[0].info
                 logging.debug("Got last report")
 
