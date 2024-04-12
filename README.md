@@ -14,7 +14,11 @@ This driver only works with Weewx 4.0+ and Python3.
 sudo -H pip3 install -r requirements.txt
 ````
 
-2) Copy `bin/user/ambientweatherapi.py` to the `bin/user` directory.  The directory location depends on your install type.  See [here](https://weewx.com/docs/usersguide.htm#Where_to_find_things) for more informaiton on how to find your `user` directory.
+2) Install the extension
+````bash
+weectl extension install https://github.com/themoosman/weewx-ambientweatherapi-json/archive/master.zip --yes
+````
+
 3) Modify `weewx.conf` using the snippets in this repo's `weeex.conf`
 4) Restart `weewx`
 
@@ -31,8 +35,6 @@ The following table outlines the `weewx.conf` station variables.
 | api_app_key | API Application Key from your ambientweather.net [website](https://ambientweather.docs.apiary.io/#) |
 | api_key | API Key from your ambientweather.net [website](https://ambientweather.docs.apiary.io/#) |
 | use_meteobridge | Set to `True` if using Meteobridge, `False` is the default or leave commented out |
+| station_mac | Specify a specific station MAC address to return data.  If blank or unspecified, then the first station in the list is returned. |
 | hardware | String to identify the hardware used |
 | driver | Don't change this value |
-
-## TODO
-1) Automate the install using `wee_extension`

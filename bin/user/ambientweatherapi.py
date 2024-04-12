@@ -19,7 +19,7 @@ import os.path
 from os import path
 
 DRIVER_NAME = 'ambientweatherapi'
-DRIVER_VERSION = '0.0.10'
+DRIVER_VERSION = '0.0.11'
 
 
 def loader(config_dict, engine):
@@ -50,6 +50,13 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
         self.max_humidity = float(stn_dict.get('max_humidity', 38))
         self.use_meteobridge = bool(stn_dict.get('use_meteobridge', False))
         logging.info('use_meteobridge: %s' % str(self.use_meteobridge))
+        self.station_mac = stn_dict.get('station_mac', '')
+        self.use_station_mac = False
+        if not self.station_mac:
+            logging.info("No Station MAC specified.  The first station will be returned.")
+        else:
+            logging.info("Using Station MAC: %s" % self.station_mac)
+            self.use_station_mac = True
         self.rainfilepath = os.path.join(tempfile.gettempdir(), rainfile)
         logging.info('Starting: %s, version: %s' % (DRIVER_NAME, DRIVER_VERSION))
         logging.debug("Exiting init()")
@@ -294,15 +301,24 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
                 # get the first device
                 devices = weather.get_devices()
                 logging.debug("Got weather devices")
-
                 if not devices:
                     logging.error('AmbientAPI get_devices() returned empty dict')
                     raise Exception('AmbientAPI get_devices() returned empty dict')
                 else:
                     logging.debug('Weather get_devices() payload not empty')
 
-                # get the last report dict
+                # get the last report dict for the first station
                 data = devices[0].last_data
+                # check to see if the user wants a specific MAC
+                if self.use_station_mac:
+                    logging.debug('Searching for specific Station MAC')
+                    for device in devices:
+                        if device.mac_address == self.station_mac:
+                            logging.info("Found station mac: %s" % self.station_mac)
+                            data = device.last_data
+                            break
+                        else:
+                            logging.debug('Specified MAC not found, using first station.')
                 # info = devices[0].info
                 logging.debug("Got last report")
 
