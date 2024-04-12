@@ -53,7 +53,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
         self.station_mac = stn_dict.get('station_mac', '')
         self.use_station_mac = False
         if not self.station_mac:
-            logging.info("No Station MAC specified.")
+            logging.info("No Station MAC specified.  The first station will be returned.")
         else:
             logging.info("Using Station MAC: %s" % self.station_mac)
             self.use_station_mac = True
@@ -307,17 +307,18 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
                 else:
                     logging.debug('Weather get_devices() payload not empty')
 
-                # get the last report dict
+                # get the last report dict for the first station
                 data = devices[0].last_data
+                # check to see if the user wants a specific MAC
                 if self.use_station_mac:
-                    logging.debug('Looking for specific Station MAC')
+                    logging.debug('Searching for specific Station MAC')
                     for device in devices:
                         if device.mac_address == self.station_mac:
                             logging.info("Found station mac: %s" % self.station_mac)
                             data = device.last_data
                             break
                         else:
-                            logging.debug('No specific MAC specified, using first station.')
+                            logging.debug('Specified MAC not found, using first station.')
                 # info = devices[0].info
                 logging.debug("Got last report")
 
