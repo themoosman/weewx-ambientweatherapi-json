@@ -316,7 +316,6 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
                 # get the last report dict
                 data = devices[0].last_data
                 logging.info(devices[0])
-                self.print_dict(devices[0])
                 if self.use_station_mac:
                     logging.debug('Looking for specific Station MAC')
                     length = len(devices)
