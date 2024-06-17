@@ -19,7 +19,7 @@ import os.path
 from os import path
 
 DRIVER_NAME = 'ambientweatherapi'
-DRIVER_VERSION = '0.0.12'
+DRIVER_VERSION = '0.0.13'
 log = logging.getLogger(__name__)
 
 
@@ -92,15 +92,13 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 
     def print_dict(self, data_dict):
         """Prints a dict."""
-        if log.DEBUG >= logging.root.level:
-            log.debug("calling: print_dict")
-            for key in data_dict:
-                log.debug(key + " = " + str(data_dict[key]))
+        log.debug("calling: print_dict")
+        for key in data_dict:
+            log.debug(key + " = " + str(data_dict[key]))
 
     def get_value(self, data_dict, key):
         """Gets the value from a dict, returns None if the key does not exist."""
-        if log.DEBUG >= logging.root.level:
-            log.debug("calling: get_value")
+        log.debug("calling: get_value")
         return data_dict.get(key, None)
 
     def get_float(self, value):
@@ -354,7 +352,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
                     is_battery = value.startswith('batt')
                     if value in data:
                         log.debug("Setting Weewx value: '%s' to: %s using Ambient field: '%s'" %
-                                      (key, str(data[value]), value))
+                                  (key, str(data[value]), value))
                         if is_battery:
                             _packet[key] = self.get_battery_status(data[value])
                         else:
@@ -362,7 +360,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
                     else:
                         log.debug("Dropping Ambient value: '%s' from Weewx packet." % (value))
 
-                self.print_dict(_packet)
+                # self.print_dict(_packet)
                 log.debug("============Completed Packet Build============")
                 yield _packet
                 log.info("loopPacket Accepted")
