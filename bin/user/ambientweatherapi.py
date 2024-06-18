@@ -49,6 +49,12 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
             log.info("Using Station MAC: %s" % self.station_mac)
             self.use_station_mac = True
         self.rainfilepath = os.path.join(tempfile.gettempdir(), rainfile)
+        self.aw_log_level = None
+        self.aw_debug = float(stn_dict.get('aw_debug', 0))
+        log.info('aw_debug: %s' % str(self.aw_debug))
+        if self.aw_debug == 1:
+            self.aw_log_level = "info"
+        log.info('aw_log_level: %s' % str(self.aw_log_level))
         log.info('Using rain file: %s' % str(self.rainfilepath))
         log.info('Loaded: %s, version: %s' % (DRIVER_NAME, DRIVER_VERSION))
         log.debug("Exiting init()")
@@ -278,7 +284,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
                 weather = AmbientAPI(AMBIENT_ENDPOINT=self.api_url,
                                      AMBIENT_API_KEY=self.api_key,
                                      AMBIENT_APPLICATION_KEY=self.api_app_key,
-                                     log_level="info")
+                                     log_level=self.aw_log_level)
                 log.debug("Init API call returned")
 
                 # get the first device
