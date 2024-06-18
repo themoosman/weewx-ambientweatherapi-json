@@ -19,7 +19,8 @@ import os.path
 from os import path
 
 DRIVER_NAME = 'ambientweatherapi'
-DRIVER_VERSION = '0.0.12'
+DRIVER_VERSION = '0.0.13'
+log = logging.getLogger(__name__)
 
 
 def loader(config_dict, engine):
@@ -34,14 +35,6 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
         rainfile = "%s_%s_rain.txt" % (DRIVER_NAME, DRIVER_VERSION)
         self.log_file = stn_dict.get('log_file', None)
         self.loop_interval = float(stn_dict.get('loop_interval', 60))
-        self.log_level = stn_dict.get('log_level', 'ERROR')
-
-        if self.log_file and self.log_level != 'console':
-            logging.basicConfig(format='%(asctime)s::%(levelname)s::%(message)s',
-                                filemode='w',
-                                filename=self.log_file,
-                                level=getattr(logging, self.log_level.upper(), 'ERROR'))
-
         self.api_url = stn_dict.get('api_url', 'https://api.ambientweather.net/v1')
         self.api_key = stn_dict.get('api_key')
         self.api_app_key = stn_dict.get('api_app_key')
@@ -49,28 +42,28 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
         self.safe_humidity = float(stn_dict.get('safe_humidity', 60))
         self.max_humidity = float(stn_dict.get('max_humidity', 38))
         self.use_meteobridge = bool(stn_dict.get('use_meteobridge', False))
-        logging.info('use_meteobridge: %s' % str(self.use_meteobridge))
+        log.info('use_meteobridge: %s' % str(self.use_meteobridge))
         self.station_mac = stn_dict.get('station_mac', '')
         self.use_station_mac = False
         if not self.station_mac:
-            logging.info("No Station MAC specified.  The first station will be returned.")
+            log.info("No Station MAC specified.  The first station will be returned.")
         else:
-            logging.info("Using Station MAC: %s" % self.station_mac)
+            log.info("Using Station MAC: %s" % self.station_mac)
             self.use_station_mac = True
         self.rainfilepath = os.path.join(tempfile.gettempdir(), rainfile)
-        logging.info('Starting: %s, version: %s' % (DRIVER_NAME, DRIVER_VERSION))
-        logging.debug("Exiting init()")
+        log.info('Starting: %s, version: %s' % (DRIVER_NAME, DRIVER_VERSION))
+        log.debug("Exiting init()")
 
     @property
     def hardware_name(self):
         """Returns the type of station."""
-        logging.debug("calling: hardware_name")
+        log.debug("calling: hardware_name")
         return self.station_hardware
 
     @property
     def archive_interval1(self):
         """Returns the archive internal."""
-        logging.debug("calling: archive_interval")
+        log.debug("calling: archive_interval")
         return self.loop_interval
 
     def calc_target_humidity(self, external_temp_f):
@@ -93,26 +86,24 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
     def convert_epoch_ms_to_sec(self, epoch_ms):
         """Converts a epoch that's in ms to sec.
         AmbientAPI returns the epoch time in ms not sec"""
-        logging.debug("calling: convert_epoch_ms_to_sec")
+        log.debug("calling: convert_epoch_ms_to_sec")
         utc_epoch_sec = epoch_ms / 1000
         return utc_epoch_sec
 
     def print_dict(self, data_dict):
         """Prints a dict."""
-        if logging.DEBUG >= logging.root.level:
-            logging.debug("calling: print_dict")
-            for key in data_dict:
-                logging.debug(key + " = " + str(data_dict[key]))
+        log.debug("calling: print_dict")
+        for key in data_dict:
+            log.debug(key + " = " + str(data_dict[key]))
 
     def get_value(self, data_dict, key):
         """Gets the value from a dict, returns None if the key does not exist."""
-        if logging.DEBUG >= logging.root.level:
-            logging.debug("calling: get_value")
+        log.debug("calling: get_value")
         return data_dict.get(key, None)
 
     def get_float(self, value):
         """Checks if a value is not, if not it performs a converstion to a float()"""
-        # logging.debug("calling: get_float")
+        # log.debug("calling: get_float")
         if value is None:
             return value
         else:
@@ -120,18 +111,18 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 
     def get_battery_status(self, value):
         """Converts the AM API battery status to somthing weewx likes."""
-        # logging.debug("calling: get_battery_status")
+        # log.debug("calling: get_battery_status")
         if value is None:
             return None
         if (value <= 0):
             if self.use_meteobridge:
-                logging.debug("use_meteobridge flip bit to 0.0")
+                log.debug("use_meteobridge flip bit to 0.0")
                 return 0.0
             else:
                 return 1.0
         else:
             if self.use_meteobridge:
-                logging.debug("use_meteobridge flip bit to 1.0")
+                log.debug("use_meteobridge flip bit to 1.0")
                 return 1.0
             else:
                 return 0.0
@@ -141,39 +132,39 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
         correctedRain = dailyrainin
         try:
             if path.exists(self.rainfilepath):
-                logging.debug('Opening file: %s' % (self.rainfilepath))
+                log.debug('Opening file: %s' % (self.rainfilepath))
                 intervalRain = open(self.rainfilepath, 'r')
                 try:
                     lastRain = float(intervalRain.read())
                 except ValueError:
-                    logging.error('String value found. Assuming zero interval rain and recording current value')
+                    log.error('String value found. Assuming zero interval rain and recording current value')
                     lastRain = dailyrainin
                 intervalRain.close()
-                logging.debug('Previous daily rain: %s' % str(lastRain))
+                log.debug('Previous daily rain: %s' % str(lastRain))
             else:
-                logging.debug('No previous value found for rain, assuming interval of 0 and recording daily value')
+                log.debug('No previous value found for rain, assuming interval of 0 and recording daily value')
                 lastRain = dailyrainin
 
-            logging.debug('Reported daily rain: %s' % str(dailyrainin))
+            log.debug('Reported daily rain: %s' % str(dailyrainin))
 
             if lastRain > dailyrainin:
                 correctedRain = dailyrainin
-                logging.debug('Recorded rain is more than reported rain; using reported rain')
+                log.debug('Recorded rain is more than reported rain; using reported rain')
             else:
                 correctedRain = dailyrainin - lastRain
                 # temp
-                # logging.info('Previous daily rain: %s' % str(lastRain))
-                # logging.info('Reported daily rain: %s' % str(dailyrainin))
-                # logging.info('Calculated interval rain: %s' % str(correctedRain))
+                # log.info('Previous daily rain: %s' % str(lastRain))
+                # log.info('Reported daily rain: %s' % str(dailyrainin))
+                # log.info('Calculated interval rain: %s' % str(correctedRain))
 
-            logging.debug('Calculated interval rain: %s' % str(correctedRain))
+            log.debug('Calculated interval rain: %s' % str(correctedRain))
             intervalRain = open(self.rainfilepath, 'w')
             intervalRain.write(str(dailyrainin))
             intervalRain.close()
 
         except Exception as e:
-            logging.error("%s driver, function: %s encountered an error." % (DRIVER_NAME, "check_rain_rate"))
-            logging.error("Error caught was: %s" % e)
+            log.error("%s driver, function: %s encountered an error." % (DRIVER_NAME, "check_rain_rate"))
+            log.error("Error caught was: %s" % e)
         finally:
             return correctedRain
 
@@ -280,47 +271,47 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
         }
 
     def genLoopPackets(self):
-        logging.debug("calling: genLoopPackets")
+        log.debug("calling: genLoopPackets")
 
         while True:
             # Query the API to get the latest reading.
             try:
                 error_occured = False
-                logging.debug("starting getLoopPackets")
+                log.debug("starting getLoopPackets")
 
                 # Adding an extra buffer so the API throttle limit isn't hit
-                logging.debug("sleeping an extra 3 seconds to not hit API throttle limit.")
+                log.debug("sleeping an extra 3 seconds to not hit API throttle limit.")
                 time.sleep(3)
 
                 # init the API
                 weather = AmbientAPI(AMBIENT_ENDPOINT=self.api_url,
                                      AMBIENT_API_KEY=self.api_key,
                                      AMBIENT_APPLICATION_KEY=self.api_app_key)
-                logging.debug("Init API call returned")
+                log.debug("Init API call returned")
 
                 # get the first device
                 devices = weather.get_devices()
-                logging.debug("Got weather devices")
+                log.debug("Got weather devices")
                 if not devices:
-                    logging.error('AmbientAPI get_devices() returned empty dict')
+                    log.error('AmbientAPI get_devices() returned empty dict')
                     raise Exception('AmbientAPI get_devices() returned empty dict')
                 else:
-                    logging.debug('Weather get_devices() payload not empty')
+                    log.debug('Weather get_devices() payload not empty')
 
                 # get the last report dict for the first station
                 data = devices[0].last_data
                 # check to see if the user wants a specific MAC
                 if self.use_station_mac:
-                    logging.debug('Searching for specific Station MAC')
+                    log.debug('Searching for specific Station MAC')
                     for device in devices:
                         if device.mac_address == self.station_mac:
-                            logging.info("Found station mac: %s" % self.station_mac)
+                            log.info("Found station mac: %s" % self.station_mac)
                             data = device.last_data
                             break
                         else:
-                            logging.debug('Specified MAC not found, using first station.')
+                            log.debug('Specified MAC not found, using first station.')
                 # info = devices[0].info
-                logging.debug("Got last report")
+                log.debug("Got last report")
 
                 # Convert the epoch to the format weewx wants.
                 current_observation = self.convert_epoch_ms_to_sec(data["dateutc"])
@@ -330,14 +321,14 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 
             except Exception as e:
                 syslog.syslog(DRIVER_NAME + " driver encountered an error.")
-                logging.error(DRIVER_NAME + " driver encountered an error.")
+                log.error(DRIVER_NAME + " driver encountered an error.")
                 syslog.syslog("Error caught was: %s" % e)
-                logging.error("Error caught was: %s" % e)
+                log.error("Error caught was: %s" % e)
                 error_occured = True
 
             # build the packet data
             try:
-                logging.debug("============Starting Packet Build============")
+                log.debug("============Starting Packet Build============")
                 if error_occured:
                     error_occured = False
                     raise Exception('Previous error occured, skipping packet build.')
@@ -360,29 +351,29 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
                 for key, value in mapping.items():
                     is_battery = value.startswith('batt')
                     if value in data:
-                        logging.debug("Setting Weewx value: '%s' to: %s using Ambient field: '%s'" %
-                                      (key, str(data[value]), value))
+                        log.debug("Setting Weewx value: '%s' to: %s using Ambient field: '%s'" %
+                                  (key, str(data[value]), value))
                         if is_battery:
                             _packet[key] = self.get_battery_status(data[value])
                         else:
                             _packet[key] = self.get_float(data[value])
                     else:
-                        logging.debug("Dropping Ambient value: '%s' from Weewx packet." % (value))
+                        log.debug("Dropping Ambient value: '%s' from Weewx packet." % (value))
 
-                self.print_dict(_packet)
-                logging.debug("============Completed Packet Build============")
+                # self.print_dict(_packet)
+                log.debug("============Completed Packet Build============")
                 yield _packet
-                logging.info("loopPacket Accepted")
+                log.info("loopPacket Accepted")
             except Exception as e:
                 syslog.syslog(DRIVER_NAME + " driver had an error sending data to weewx.")
-                logging.error(DRIVER_NAME + " driver had an error sending data to weewx.")
+                log.error(DRIVER_NAME + " driver had an error sending data to weewx.")
                 syslog.syslog("Error caught was: %s" % e)
-                logging.error("Error caught was: %s" % e)
+                log.error("Error caught was: %s" % e)
 
             # Sleepy Time
-            logging.debug("Going to sleep")
+            log.debug("Going to sleep")
             time.sleep(self.loop_interval)
-            logging.debug("Mom, I'm up!")
+            log.debug("Mom, I'm up!")
 
 
 if __name__ == "__main__":
