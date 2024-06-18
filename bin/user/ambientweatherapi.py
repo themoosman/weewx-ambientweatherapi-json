@@ -19,7 +19,7 @@ import os.path
 from os import path
 
 DRIVER_NAME = 'ambientweatherapi'
-DRIVER_VERSION = '0.0.13'
+DRIVER_VERSION = '0.0.14'
 log = logging.getLogger(__name__)
 
 
@@ -32,15 +32,13 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
     """Custom driver for Ambient Weather API."""
 
     def __init__(self, **stn_dict):
+        log.info('Starting: %s, version: %s' % (DRIVER_NAME, DRIVER_VERSION))
         rainfile = "%s_%s_rain.txt" % (DRIVER_NAME, DRIVER_VERSION)
-        self.log_file = stn_dict.get('log_file', None)
         self.loop_interval = float(stn_dict.get('loop_interval', 60))
         self.api_url = stn_dict.get('api_url', 'https://api.ambientweather.net/v1')
         self.api_key = stn_dict.get('api_key')
         self.api_app_key = stn_dict.get('api_app_key')
         self.station_hardware = stn_dict.get('hardware', 'Undefined')
-        self.safe_humidity = float(stn_dict.get('safe_humidity', 60))
-        self.max_humidity = float(stn_dict.get('max_humidity', 38))
         self.use_meteobridge = bool(stn_dict.get('use_meteobridge', False))
         log.info('use_meteobridge: %s' % str(self.use_meteobridge))
         self.station_mac = stn_dict.get('station_mac', '')
@@ -51,7 +49,8 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
             log.info("Using Station MAC: %s" % self.station_mac)
             self.use_station_mac = True
         self.rainfilepath = os.path.join(tempfile.gettempdir(), rainfile)
-        log.info('Starting: %s, version: %s' % (DRIVER_NAME, DRIVER_VERSION))
+        log.info('Using rain file: %s' % str(self.rainfilepath))
+        log.info('Loaded: %s, version: %s' % (DRIVER_NAME, DRIVER_VERSION))
         log.debug("Exiting init()")
 
     @property
@@ -65,23 +64,6 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
         """Returns the archive internal."""
         log.debug("calling: archive_interval")
         return self.loop_interval
-
-    def calc_target_humidity(self, external_temp_f):
-        """Converts the optimal indoor humidity.  Drop target humidity 5% for every 5degree C drop below 0"""
-        external_temp_c = (external_temp_f - 32) * 5.0 / 9.0
-        if external_temp_c >= 0:
-            return self.max_humidity
-        else:
-            target = max(0, self.max_humidity + external_temp_c)
-            if external_temp_c <= -15:
-                target = target + 2.5
-            if external_temp_c <= -20:
-                target = target + 2.5
-            if external_temp_c <= -25:
-                target = target + 2.5
-            if external_temp_c <= -30:
-                target = target + 2.5
-            return target
 
     def convert_epoch_ms_to_sec(self, epoch_ms):
         """Converts a epoch that's in ms to sec.
@@ -358,7 +340,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
                         else:
                             _packet[key] = self.get_float(data[value])
                     else:
-                        log.debug("Dropping Ambient value: '%s' from Weewx packet." % (value))
+                        log.info("Dropping Ambient value: '%s' from Weewx packet." % (value))
 
                 # self.print_dict(_packet)
                 log.debug("============Completed Packet Build============")
