@@ -340,8 +340,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
                         else:
                             _packet[key] = self.get_float(data[value])
                     else:
-                        log.info("Dropping Ambient value: '%s' from Weewx packet." % (value))
-                        log.info("Weewx value: '%s' not found in Ambient JSON packet." % (key))
+                        log.info("Weewx value: '%s' not found in AW JSON packet." % (key))
 
                 # self.print_dict(_packet)
                 log.debug("============Completed Packet Build============")
