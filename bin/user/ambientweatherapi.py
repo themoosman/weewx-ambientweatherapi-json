@@ -74,9 +74,10 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 
     def print_dict(self, data_dict):
         """Prints a dict."""
-        log.debug("calling: print_dict")
-        for key in data_dict:
-            log.debug(key + " = " + str(data_dict[key]))
+        if log.getEffectiveLevel() == logging.DEBUG:
+            log.debug("calling: print_dict")
+            for key in data_dict:
+                log.debug(key + " = " + str(data_dict[key]))
 
     def get_value(self, data_dict, key):
         """Gets the value from a dict, returns None if the key does not exist."""
@@ -85,11 +86,12 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 
     def get_float(self, value):
         """Checks if a value is not, if not it performs a converstion to a float()"""
-        # log.debug("calling: get_float")
-        if value is None:
-            return value
-        else:
-            return float(value)
+        if log.getEffectiveLevel() == logging.DEBUG:
+            # log.debug("calling: get_float")
+            if value is None:
+                return value
+            else:
+                return float(value)
 
     def get_battery_status(self, value):
         """Converts the AM API battery status to somthing weewx likes."""
@@ -268,7 +270,8 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
                 # init the API
                 weather = AmbientAPI(AMBIENT_ENDPOINT=self.api_url,
                                      AMBIENT_API_KEY=self.api_key,
-                                     AMBIENT_APPLICATION_KEY=self.api_app_key)
+                                     AMBIENT_APPLICATION_KEY=self.api_app_key,
+                                     log_level="info")
                 log.debug("Init API call returned")
 
                 # get the first device
