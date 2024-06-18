@@ -50,7 +50,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
             self.use_station_mac = True
         self.rainfilepath = os.path.join(tempfile.gettempdir(), rainfile)
         self.aw_log_level = None
-        self.aw_debug = float(stn_dict.get('aw_debug', 0))
+        self.aw_debug = int(stn_dict.get('aw_debug', 0))
         log.info('aw_debug: %s' % str(self.aw_debug))
         if self.aw_debug == 1:
             self.aw_log_level = "info"
