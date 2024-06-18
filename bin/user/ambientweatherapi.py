@@ -287,7 +287,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
                     log.debug('Searching for specific Station MAC')
                     for device in devices:
                         if device.mac_address == self.station_mac:
-                            log.info("Found station mac: %s" % self.station_mac)
+                            log.info("Using station mac: %s" % self.station_mac)
                             data = device.last_data
                             break
                         else:
@@ -341,6 +341,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
                             _packet[key] = self.get_float(data[value])
                     else:
                         log.info("Dropping Ambient value: '%s' from Weewx packet." % (value))
+                        log.info("Weewx value: '%s' not found in Ambient JSON packet." % (value))
 
                 # self.print_dict(_packet)
                 log.debug("============Completed Packet Build============")
