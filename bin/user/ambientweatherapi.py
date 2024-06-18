@@ -86,16 +86,15 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 
     def get_float(self, value):
         """Checks if a value is not, if not it performs a converstion to a float()"""
-        if log.getEffectiveLevel() == logging.DEBUG:
-            # log.debug("calling: get_float")
-            if value is None:
-                return value
-            else:
-                return float(value)
+        log.debug("calling: get_float")
+        if value is None:
+            return value
+        else:
+            return float(value)
 
     def get_battery_status(self, value):
         """Converts the AM API battery status to somthing weewx likes."""
-        # log.debug("calling: get_battery_status")
+        log.debug("calling: get_battery_status")
         if value is None:
             return None
         if (value <= 0):
@@ -128,6 +127,14 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
             else:
                 log.debug('No previous value found for rain, assuming interval of 0 and recording daily value')
                 lastRain = dailyrainin
+
+            if dailyrainin is None:
+                log.info("Daily rain (from API) is none, skipping calculation")
+                return 0
+
+            if lastRain is None:
+                log.info("Previous rain (from cache) is none, skipping calculation")
+                return 0
 
             log.debug('Reported daily rain: %s' % str(dailyrainin))
 
@@ -345,7 +352,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
                     else:
                         log.info("Weewx value: '%s' not found in AW JSON packet." % (key))
 
-                # self.print_dict(_packet)
+                self.print_dict(_packet)
                 log.debug("============Completed Packet Build============")
                 yield _packet
                 log.info("loopPacket Accepted")
