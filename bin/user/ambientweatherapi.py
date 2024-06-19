@@ -19,7 +19,7 @@ import os.path
 from os import path
 
 DRIVER_NAME = 'ambientweatherapi'
-DRIVER_VERSION = '0.0.13'
+DRIVER_VERSION = '0.0.14'
 log = logging.getLogger(__name__)
 
 
@@ -32,15 +32,13 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
     """Custom driver for Ambient Weather API."""
 
     def __init__(self, **stn_dict):
+        log.info('Starting: %s, version: %s' % (DRIVER_NAME, DRIVER_VERSION))
         rainfile = "%s_%s_rain.txt" % (DRIVER_NAME, DRIVER_VERSION)
-        self.log_file = stn_dict.get('log_file', None)
         self.loop_interval = float(stn_dict.get('loop_interval', 60))
         self.api_url = stn_dict.get('api_url', 'https://api.ambientweather.net/v1')
         self.api_key = stn_dict.get('api_key')
         self.api_app_key = stn_dict.get('api_app_key')
         self.station_hardware = stn_dict.get('hardware', 'Undefined')
-        self.safe_humidity = float(stn_dict.get('safe_humidity', 60))
-        self.max_humidity = float(stn_dict.get('max_humidity', 38))
         self.use_meteobridge = bool(stn_dict.get('use_meteobridge', False))
         log.info('use_meteobridge: %s' % str(self.use_meteobridge))
         self.station_mac = stn_dict.get('station_mac', '')
@@ -51,7 +49,14 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
             log.info("Using Station MAC: %s" % self.station_mac)
             self.use_station_mac = True
         self.rainfilepath = os.path.join(tempfile.gettempdir(), rainfile)
-        log.info('Starting: %s, version: %s' % (DRIVER_NAME, DRIVER_VERSION))
+        self.aw_log_level = None
+        self.aw_debug = int(stn_dict.get('aw_debug', 0))
+        log.info('aw_debug: %s' % str(self.aw_debug))
+        if self.aw_debug == 1:
+            self.aw_log_level = "info"
+        log.info('aw_log_level: %s' % str(self.aw_log_level))
+        log.info('Using rain file: %s' % str(self.rainfilepath))
+        log.info('Loaded: %s, version: %s' % (DRIVER_NAME, DRIVER_VERSION))
         log.debug("Exiting init()")
 
     @property
@@ -66,23 +71,6 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
         log.debug("calling: archive_interval")
         return self.loop_interval
 
-    def calc_target_humidity(self, external_temp_f):
-        """Converts the optimal indoor humidity.  Drop target humidity 5% for every 5degree C drop below 0"""
-        external_temp_c = (external_temp_f - 32) * 5.0 / 9.0
-        if external_temp_c >= 0:
-            return self.max_humidity
-        else:
-            target = max(0, self.max_humidity + external_temp_c)
-            if external_temp_c <= -15:
-                target = target + 2.5
-            if external_temp_c <= -20:
-                target = target + 2.5
-            if external_temp_c <= -25:
-                target = target + 2.5
-            if external_temp_c <= -30:
-                target = target + 2.5
-            return target
-
     def convert_epoch_ms_to_sec(self, epoch_ms):
         """Converts a epoch that's in ms to sec.
         AmbientAPI returns the epoch time in ms not sec"""
@@ -92,9 +80,10 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 
     def print_dict(self, data_dict):
         """Prints a dict."""
-        log.debug("calling: print_dict")
-        for key in data_dict:
-            log.debug(key + " = " + str(data_dict[key]))
+        if log.getEffectiveLevel() == logging.DEBUG:
+            log.debug("calling: print_dict")
+            for key in data_dict:
+                log.debug(key + " = " + str(data_dict[key]))
 
     def get_value(self, data_dict, key):
         """Gets the value from a dict, returns None if the key does not exist."""
@@ -103,7 +92,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 
     def get_float(self, value):
         """Checks if a value is not, if not it performs a converstion to a float()"""
-        # log.debug("calling: get_float")
+        log.debug("calling: get_float")
         if value is None:
             return value
         else:
@@ -111,7 +100,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 
     def get_battery_status(self, value):
         """Converts the AM API battery status to somthing weewx likes."""
-        # log.debug("calling: get_battery_status")
+        log.debug("calling: get_battery_status")
         if value is None:
             return None
         if (value <= 0):
@@ -144,6 +133,14 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
             else:
                 log.debug('No previous value found for rain, assuming interval of 0 and recording daily value')
                 lastRain = dailyrainin
+
+            if dailyrainin is None:
+                log.info("Daily rain (from API) is none, skipping calculation")
+                return 0
+
+            if lastRain is None:
+                log.info("Previous rain (from cache) is none, skipping calculation")
+                return 0
 
             log.debug('Reported daily rain: %s' % str(dailyrainin))
 
@@ -286,7 +283,8 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
                 # init the API
                 weather = AmbientAPI(AMBIENT_ENDPOINT=self.api_url,
                                      AMBIENT_API_KEY=self.api_key,
-                                     AMBIENT_APPLICATION_KEY=self.api_app_key)
+                                     AMBIENT_APPLICATION_KEY=self.api_app_key,
+                                     log_level=self.aw_log_level)
                 log.debug("Init API call returned")
 
                 # get the first device
@@ -305,7 +303,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
                     log.debug('Searching for specific Station MAC')
                     for device in devices:
                         if device.mac_address == self.station_mac:
-                            log.info("Found station mac: %s" % self.station_mac)
+                            log.info("Using station mac: %s" % self.station_mac)
                             data = device.last_data
                             break
                         else:
@@ -358,9 +356,9 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
                         else:
                             _packet[key] = self.get_float(data[value])
                     else:
-                        log.debug("Dropping Ambient value: '%s' from Weewx packet." % (value))
+                        log.info("Weewx value: '%s' not found in AW JSON packet." % (key))
 
-                # self.print_dict(_packet)
+                self.print_dict(_packet)
                 log.debug("============Completed Packet Build============")
                 yield _packet
                 log.info("loopPacket Accepted")

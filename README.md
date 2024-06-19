@@ -32,7 +32,8 @@ The following table outlines the `weewx.conf` station variables.
 | api_url | Ambient Weather API endpoint.  You probably don't need to change this. |
 | api_app_key | API Application Key from your ambientweather.net [website](https://ambientweather.docs.apiary.io/#) |
 | api_key | API Key from your ambientweather.net [website](https://ambientweather.docs.apiary.io/#) |
-| use_meteobridge | Set to `True` if using Meteobridge, `False` is the default or leave commented out |
-| station_mac | Specify a specific station MAC address to return data.  If blank or unspecified, then the first station in the list is returned. |
 | hardware | String to identify the hardware used |
 | driver | Don't change this value |
+| aw_debug | Optional:  Set to `1` to get verbose output from the Ambient API.  The default value is `0` |
+| use_meteobridge | Optional: Set to `True` if using Meteobridge, `False` is the default or leave commented out |
+| station_mac | Optional: Specify a specific station MAC address to return data.  If blank or unspecified, then the first station in the list is returned. |
