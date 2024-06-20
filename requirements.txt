@@ -1,2 +1,2 @@
-ambient-api >= 1.5.5
+ambient-api >= 1.5.7
 flake8 >= 3.8.3
