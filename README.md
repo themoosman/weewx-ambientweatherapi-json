@@ -1,5 +1,8 @@
-![](https://github.com/themoosman/weewx-ambientweatherapi-json/workflows/flake8%20Lint/badge.svg)
 # weewx AmbientWeather API Driver
+
+![Version](https://img.shields.io/github/v/release/themoosman/weewx-ambientweatherapi-json?sort=semver)
+[![Linux CI](https://github.com/themoosman/weewx-ambientweatherapi-json/workflows/Linux%20CI/badge.svg)](https://github.com/themoosman/weewx-ambientweatherapi-json/actions?query=workflow%3A%22Linux+CI%22)
+![Lint](https://github.com/themoosman/weewx-ambientweatherapi-json/workflows/flake8%20Lint/badge.svg)
 
 This is an AmbientWeather API driver for weewx.  This will work with any AmbientWeather stations that uploads data to ambientweather.net.  I decided to go this route as the only way to get access to some infomration is via the Ambinent Weather API.  Since I have a number of external temperature sensors I wrote this driver so I could pull that data into weewx.
 

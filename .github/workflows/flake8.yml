@@ -5,16 +5,20 @@ on: [push, pull_request]
 jobs:
   flake8-lint:
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: [ '3.8', '3.9', '3.10', '3.11', '3.12' ]
     name: Lint
     steps:
       - name: Check out source repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@v4
       - name: Set up Python environment
-        uses: actions/setup-python@v1
+        uses: actions/setup-python@v5
         with:
-          python-version: "3.8"
+          python-version: ${{ matrix.python-version }}
+          architecture: x64
       - name: flake8 Lint
-        uses: py-actions/flake8@v1
+        uses: py-actions/flake8@v2
         with:
           ignore: "F401"
           max-line-length: "120"
