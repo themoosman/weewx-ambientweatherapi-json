@@ -185,7 +185,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
             'batt6': 'batt6',
             'batt7': 'batt7',
             'batt8': 'batt8',
-            'batt_25': 'batt_co2',
+            'batt_25': 'batt_25',
             'co2': 'co2_in_aqin',
             'co2_24': 'co2_in_24h_aqin',
             'dewPoint': 'dewPoint',
