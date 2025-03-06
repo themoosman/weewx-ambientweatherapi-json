@@ -80,7 +80,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 
     def print_dict(self, data_dict):
         """Prints a dict."""
-        if log.getEffectiveLevel() == logging.DEBUG:
+        if self.aw_debug == 1:
             log.debug("calling: print_dict")
             for key in data_dict:
                 log.debug(key + " = " + str(data_dict[key]))
@@ -358,7 +358,8 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
                         else:
                             _packet[key] = self.get_float(data[value])
                     else:
-                        log.info("Weewx value: '%s' not found in AW JSON packet." % (key))
+                        if self.aw_debug == 1:
+                            log.info("Weewx value: '%s' not found in AW JSON packet." % (key))
 
                 self.print_dict(_packet)
                 log.debug("============Completed Packet Build============")
