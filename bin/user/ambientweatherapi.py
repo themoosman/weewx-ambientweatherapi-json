@@ -19,7 +19,7 @@ import os.path
 from os import path
 
 DRIVER_NAME = 'ambientweatherapi'
-DRIVER_VERSION = '0.0.15'
+DRIVER_VERSION = '0.0.16'
 log = logging.getLogger(__name__)
 
 
@@ -80,7 +80,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
 
     def print_dict(self, data_dict):
         """Prints a dict."""
-        if log.getEffectiveLevel() == logging.DEBUG:
+        if self.aw_debug == 1:
             log.debug("calling: print_dict")
             for key in data_dict:
                 log.debug(key + " = " + str(data_dict[key]))
@@ -185,7 +185,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
             'batt6': 'batt6',
             'batt7': 'batt7',
             'batt8': 'batt8',
-            'batt_25': 'batt_co2',
+            'batt_25': 'batt_25',
             'co2': 'co2_in_aqin',
             'co2_24': 'co2_in_24h_aqin',
             'dewPoint': 'dewPoint',
@@ -237,10 +237,12 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
             'outHumidity': 'humidity',
             'outTemp': 'tempf',
             'outTempBatteryStatus': 'battout',
+            'pm2_5': 'pm25',
+            'outdoor_aqi': 'aqi_pm25',
             'pm2_5_aqi': 'aqi_pm25_aqin',
-            'pm2_5': 'pm25_in_aqin',
+            'pm2_5_in': 'pm25_in_aqin',
             'pm10_0_aqi': 'aqi_pm10_aqin',
-            'pm10_0': 'pm10_in_aqin',
+            'pm10_0_in': 'pm10_in_aqin',
             'pm2_5_24': 'pm25_in_24h_aqin',
             'pm10_0_24': 'pm10_in_24h_aqin',
             'pm2_5_aqi_24': 'aqi_pm25_24h_aqin',
@@ -356,7 +358,8 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
                         else:
                             _packet[key] = self.get_float(data[value])
                     else:
-                        log.info("Weewx value: '%s' not found in AW JSON packet." % (key))
+                        if self.aw_debug == 1:
+                            log.info("Weewx value: '%s' not found in AW JSON packet." % (key))
 
                 self.print_dict(_packet)
                 log.debug("============Completed Packet Build============")
