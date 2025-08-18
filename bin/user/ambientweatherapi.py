@@ -19,7 +19,7 @@ import os.path
 from os import path
 
 DRIVER_NAME = 'ambientweatherapi'
-DRIVER_VERSION = '0.0.16.1'
+DRIVER_VERSION = '0.0.17'
 log = logging.getLogger(__name__)
 
 
