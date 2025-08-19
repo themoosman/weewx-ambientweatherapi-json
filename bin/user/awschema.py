@@ -71,7 +71,7 @@ table = [('dateTime', 'INTEGER NOT NULL UNIQUE PRIMARY KEY'),
          ('leafWet1', 'REAL'),
          ('leafWet2', 'REAL'),
          ('lightning_distance', 'REAL'),
-         ('lightning_disturber_count','REAL'),
+         ('lightning_disturber_count', 'REAL'),
          ('lightning_energy', 'REAL'),
          ('lightning_noise_count', 'REAL'),
          ('lightning_strike_count', 'REAL'),
@@ -86,8 +86,8 @@ table = [('dateTime', 'INTEGER NOT NULL UNIQUE PRIMARY KEY'),
          ('outTempBatteryStatus', 'REAL'),
          ('pb', 'REAL'),
          ('pm10_0', 'REAL'),
-         ('pm1_0',  'REAL'),
-         ('pm2_5',  'REAL'),
+         ('pm1_0', 'REAL'),
+         ('pm2_5', 'REAL'),
          ('pressure', 'REAL'),
          ('radiation', 'REAL'),
          ('rain', 'REAL'),
@@ -139,10 +139,9 @@ table = [('dateTime', 'INTEGER NOT NULL UNIQUE PRIMARY KEY'),
          ('leak4', 'INTEGER')
          ]
 
-day_summaries = [(e[0], 'scalar') for e in table
-        if e[0] not in ('dateTime', 'usUnits', 'interval')] + [('wind', 'VECTOR')]
+day_summaries = [(e[0], 'scalar') for e in table if e[0] not in ('dateTime', 'usUnits', 'interval')] + [('wind', 'VECTOR')]
 
 schema = {
     'table': table,
-    'day_summaries' : day_summaries
+    'day_summaries': day_summaries
 }
