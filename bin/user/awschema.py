@@ -139,7 +139,8 @@ table = [('dateTime', 'INTEGER NOT NULL UNIQUE PRIMARY KEY'),
          ('leak4', 'INTEGER')
          ]
 
-day_summaries = [(e[0], 'scalar') for e in table if e[0] not in ('dateTime', 'usUnits', 'interval')] + [('wind', 'VECTOR')]
+day_summaries = [(e[0], 'scalar') for e in table if e[0] not in
+                 ('dateTime', 'usUnits', 'interval')] + [('wind', 'VECTOR')]
 
 schema = {
     'table': table,
