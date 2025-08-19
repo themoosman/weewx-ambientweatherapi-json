@@ -22,5 +22,5 @@ class AmbientWeatherApiInstaller(ExtensionInstaller):
                     'api_app_key': 'xxxxxx',
                     'api_key': 'xxxxxx',
                     'hardware': 'My Weather Station'}},
-            files=[('bin/user', ['bin/user/ambientweatherapi.py'])]
+            files=[('bin/user', ['bin/user/ambientweatherapi.py', 'bin/user/awschema.py'])]
         )
