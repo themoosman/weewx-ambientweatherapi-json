@@ -10,7 +10,7 @@ def loader():
 class AmbientWeatherApiInstaller(ExtensionInstaller):
     def __init__(self):
         super(AmbientWeatherApiInstaller, self).__init__(
-            version="0.0.16",
+            version="0.0.17",
             name='ambientweatherapi',
             description='WeeWx AmbientWeather API Driver.',
             author="Karl Moos",
@@ -22,5 +22,5 @@ class AmbientWeatherApiInstaller(ExtensionInstaller):
                     'api_app_key': 'xxxxxx',
                     'api_key': 'xxxxxx',
                     'hardware': 'My Weather Station'}},
-            files=[('bin/user', ['bin/user/ambientweatherapi.py'])]
+            files=[('bin/user', ['bin/user/ambientweatherapi.py', 'bin/user/awschema.py'])]
         )
