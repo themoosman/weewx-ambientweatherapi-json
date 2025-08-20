@@ -31,7 +31,7 @@ The following table outlines the `weewx.conf` station variables.
 
 | Variable | Description |
 | --- | --- |
-| loop_interval | How often the driver will make an API call.  Becareful as Ambient Weather has [limits](https://ambientweather.docs.apiary.io/#) |
+| loop_interval | How often the driver will make an API call.  Be careful as Ambient Weather has [limits](https://ambientweather.docs.apiary.io/#) |
 | api_url | Ambient Weather API endpoint.  You probably don't need to change this. |
 | api_app_key | API Application Key from your ambientweather.net [website](https://ambientweather.docs.apiary.io/#) |
 | api_key | API Key from your ambientweather.net [website](https://ambientweather.docs.apiary.io/#) |
