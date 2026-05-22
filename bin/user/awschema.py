@@ -136,7 +136,8 @@ table = [('dateTime', 'INTEGER NOT NULL UNIQUE PRIMARY KEY'),
          ('leak1', 'INTEGER'),
          ('leak2', 'INTEGER'),
          ('leak3', 'INTEGER'),
-         ('leak4', 'INTEGER')
+         ('leak4', 'INTEGER'),
+         ('aqi', 'REAL')
          ]
 
 day_summaries = [(e[0], 'scalar') for e in table if e[0] not in
