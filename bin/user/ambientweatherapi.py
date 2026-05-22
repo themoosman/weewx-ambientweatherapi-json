@@ -19,7 +19,7 @@ import os.path
 from os import path
 
 DRIVER_NAME = 'ambientweatherapi'
-DRIVER_VERSION = '0.0.17'
+DRIVER_VERSION = '0.0.18'
 log = logging.getLogger(__name__)
 
 
@@ -168,6 +168,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
     def get_packet_mapping(self):
         """Gets the mapping of weewx values (key) to AmbientAPI values (value)."""
         return {
+            'aqi': 'aqi_pm25',
             'barometer': 'baromrelin',
             'batteryStatus1': 'batt1',
             'batteryStatus2': 'batt2',
