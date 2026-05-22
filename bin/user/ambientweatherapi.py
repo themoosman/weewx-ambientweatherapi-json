@@ -162,8 +162,8 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
         except Exception as e:
             log.error("%s driver, function: %s encountered an error." % (DRIVER_NAME, "check_rain_rate"))
             log.error("Error caught was: %s" % e)
-        finally:
-            return correctedRain
+
+        return correctedRain
 
     def get_packet_mapping(self):
         """Gets the mapping of weewx values (key) to AmbientAPI values (value)."""
