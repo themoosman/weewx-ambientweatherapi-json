@@ -242,7 +242,7 @@ class AmbientWeatherAPI(weewx.drivers.AbstractDevice):
             'outHumidity': 'humidity',
             'outTemp': 'tempf',
             'outTempBatteryStatus': 'battout',
-            'pm2_5_aqi': 'aqi_pm25,
+            'pm2_5_aqi': 'aqi_pm25',
             'pm2_5': 'pm25',
             'outdoor_aqi': 'aqi_pm25',
             'pm2_5_aqin': 'aqi_pm25_aqin',
